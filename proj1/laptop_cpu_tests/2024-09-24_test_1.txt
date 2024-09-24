@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 2':
+
+          3,103.44 msec task-clock                #    1.000 CPUs utilized          
+                 4      context-switches          #    1.289 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+           262,202      page-faults               #   84.488 K/sec                  
+    11,036,149,558      cycles                    #    3.556 GHz                    
+    28,490,693,083      instructions              #    2.58  insn per cycle         
+     6,101,194,860      branches                  #    1.966 G/sec                  
+         1,270,183      branch-misses             #    0.02% of all branches        
+
+       3.104443972 seconds time elapsed
+
+       2.820383000 seconds user
+       0.284038000 seconds sys
+
+

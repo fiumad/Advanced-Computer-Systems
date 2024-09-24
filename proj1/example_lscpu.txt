@@ -1,0 +1,42 @@
+Architecture:             x86_64
+  CPU op-mode(s):         32-bit, 64-bit
+  Address sizes:          39 bits physical, 48 bits virtual
+  Byte Order:             Little Endian
+CPU(s):                   12
+  On-line CPU(s) list:    0-11
+Vendor ID:                GenuineIntel
+  Model name:             Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz
+    CPU family:           6
+    Model:                165
+    Thread(s) per core:   2
+    Core(s) per socket:   6
+    Socket(s):            1
+    Stepping:             2
+    CPU max MHz:          5100.0000
+    CPU min MHz:          800.0000
+    BogoMIPS:             5399.81
+    Flags:                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge m
+                          ca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 s
+                          s ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc 
+                          art arch_perfmon pebs bts rep_good nopl xtopology nons
+                          top_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor 
+                          ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm p
+                          cid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_tim
+                          er aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch
+                           cpuid_fault epb invpcid_single ssbd ibrs ibpb stibp i
+                          brs_enhanced tpr_shadow vnmi flexpriority ept vpid ept
+                          _ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpc
+                          id mpx rdseed adx smap clflushopt intel_pt xsaveopt xs
+                          avec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_no
+                          tify hwp_act_window hwp_epp pku ospke md_clear flush_l
+                          1d arch_capabilities
+Virtualization features:  
+  Virtualization:         VT-x
+Caches (sum of all):      
+  L1d:                    192 KiB (6 instances)
+  L1i:                    192 KiB (6 instances)
+  L2:                     1.5 MiB (6 instances)
+  L3:                     12 MiB (1 instance)
+NUMA:                     
+  NUMA node(s):           1
+  NUMA node0 CPU(s):      0-11

@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 1024':
+
+            328.47 msec task-clock                #    0.994 CPUs utilized          
+                32      context-switches          #   97.422 /sec                   
+                 1      cpu-migrations            #    3.044 /sec                   
+           262,206      page-faults               #  798.271 K/sec                  
+     1,153,443,991      cycles                    #    3.512 GHz                    
+     1,224,030,706      instructions              #    1.06  insn per cycle         
+       214,397,251      branches                  #  652.720 M/sec                  
+           193,474      branch-misses             #    0.09% of all branches        
+
+       0.330389299 seconds time elapsed
+
+       0.063311000 seconds user
+       0.265118000 seconds sys
+
+

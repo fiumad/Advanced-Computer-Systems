@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 8':
+
+            979.30 msec task-clock                #    1.000 CPUs utilized          
+                 3      context-switches          #    3.063 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+           262,207      page-faults               #  267.749 K/sec                  
+     3,532,382,363      cycles                    #    3.607 GHz                    
+     7,416,392,743      instructions              #    2.10  insn per cycle         
+     1,403,198,206      branches                  #    1.433 G/sec                  
+           355,097      branch-misses             #    0.03% of all branches        
+
+       0.979614813 seconds time elapsed
+
+       0.727710000 seconds user
+       0.251899000 seconds sys
+
+
