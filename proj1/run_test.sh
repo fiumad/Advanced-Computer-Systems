@@ -10,9 +10,7 @@ today_date=$(date +%Y-%m-%d)
 filename="${cpu_model// /_}${today_date}.txt"
 
 # Run lscpu, remove the Vulnerabilities section, and save to file
-#lscpu | head -n 26 > $filename
-# Inform the user where the file is saved
-echo "lscpu output saved to $filename"
+lscpu | head -n 26
 
 byte_size=1
 
