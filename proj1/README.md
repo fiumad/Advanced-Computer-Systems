@@ -2,7 +2,7 @@
 
 ## Results
 
-!(results)[./laptop_cpu_tests/byteSizeVSelapsed.png]
+![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed.png)
 
 
 ##### How to Run (notes to self)
