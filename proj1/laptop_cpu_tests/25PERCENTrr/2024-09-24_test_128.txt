@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 256 25':
+
+            319.49 msec task-clock                #    0.995 CPUs utilized          
+                 9      context-switches          #   28.170 /sec                   
+                 1      cpu-migrations            #    3.130 /sec                   
+           262,206      page-faults               #  820.697 K/sec                  
+     1,130,422,669      cycles                    #    3.538 GHz                    
+     1,296,941,136      instructions              #    1.15  insn per cycle         
+       235,464,429      branches                  #  736.997 M/sec                  
+           224,257      branch-misses             #    0.10% of all branches        
+
+       0.321226411 seconds time elapsed
+
+       0.063965000 seconds user
+       0.255861000 seconds sys
+
+

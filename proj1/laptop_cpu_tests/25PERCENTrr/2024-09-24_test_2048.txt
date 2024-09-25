@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 4096 25':
+
+            361.44 msec task-clock                #    0.987 CPUs utilized          
+                51      context-switches          #  141.102 /sec                   
+                 1      cpu-migrations            #    2.767 /sec                   
+           262,207      page-faults               #  725.447 K/sec                  
+     1,279,142,387      cycles                    #    3.539 GHz                    
+     1,127,791,890      instructions              #    0.88  insn per cycle         
+       199,101,079      branches                  #  550.852 M/sec                  
+           232,204      branch-misses             #    0.12% of all branches        
+
+       0.366270676 seconds time elapsed
+
+       0.072861000 seconds user
+       0.287396000 seconds sys
+
+

@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 2097152 25':
+
+            346.77 msec task-clock                #    0.999 CPUs utilized          
+                 1      context-switches          #    2.884 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+           262,205      page-faults               #  756.127 K/sec                  
+     1,230,373,927      cycles                    #    3.548 GHz                    
+     1,117,300,198      instructions              #    0.91  insn per cycle         
+       196,860,280      branches                  #  567.691 M/sec                  
+           217,889      branch-misses             #    0.11% of all branches        
+
+       0.347053480 seconds time elapsed
+
+       0.064576000 seconds user
+       0.282523000 seconds sys
+
+

@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 32768 25':
+
+            346.69 msec task-clock                #    0.999 CPUs utilized          
+                 0      context-switches          #    0.000 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+           262,204      page-faults               #  756.314 K/sec                  
+     1,232,961,641      cycles                    #    3.556 GHz                    
+     1,119,697,126      instructions              #    0.91  insn per cycle         
+       197,409,115      branches                  #  569.416 M/sec                  
+           220,472      branch-misses             #    0.11% of all branches        
+
+       0.346971797 seconds time elapsed
+
+       0.052456000 seconds user
+       0.294563000 seconds sys
+
+

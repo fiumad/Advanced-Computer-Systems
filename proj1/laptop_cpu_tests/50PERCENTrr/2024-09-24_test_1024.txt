@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 2048 50':
+
+            308.00 msec task-clock                #    0.994 CPUs utilized          
+                15      context-switches          #   48.701 /sec                   
+                 1      cpu-migrations            #    3.247 /sec                   
+           262,206      page-faults               #  851.308 K/sec                  
+     1,085,595,509      cycles                    #    3.525 GHz                    
+     1,194,612,022      instructions              #    1.10  insn per cycle         
+       209,439,782      branches                  #  679.991 M/sec                  
+           212,643      branch-misses             #    0.10% of all branches        
+
+       0.309928401 seconds time elapsed
+
+       0.031983000 seconds user
+       0.275860000 seconds sys
+
+

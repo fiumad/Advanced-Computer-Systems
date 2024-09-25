@@ -32,7 +32,7 @@ def plot_data_pairs(data_pairs):
     # Add labels and title
     plt.xlabel('Byte Size')
     plt.ylabel('Time Elapsed (seconds)')
-    plt.suptitle('Intel i7-10850H - 50% Read Ratio')
+    plt.suptitle('Intel i7-10850H - 25% Read Ratio')
     plt.xticks(byte_sizes)
     plt.xscale('log', base=2)
     plt.title('Performance: Byte Size vs Time Elapsed')
@@ -46,8 +46,8 @@ if __name__ == '__main__':
 
     data_pairs = []
 
-    for filename in os.listdir("./50PERCENTrr/"):
-        file_path = os.path.join("./50PERCENTrr/", filename)
+    for filename in os.listdir("./25PERCENTrr/"):
+        file_path = os.path.join("./25PERCENTrr/", filename)
         #print(file_path)
 
         if filename.endswith('.txt') and os.path.isfile(file_path) and filename != "CPUInfo.txt":

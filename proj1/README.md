@@ -2,8 +2,11 @@
 
 ## Results
 
-### Byte size vs. elapsed time for writing then reading 1 GB of data.
-![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed.png)
+### Byte size vs. elapsed time for writing 1GB of data then reading 1 GB * read ratio of data.
+![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed100rr.png)
+![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed75rr.png)
+![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed50rr.png)
+![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed25rr.png)
 
 ## Method
 

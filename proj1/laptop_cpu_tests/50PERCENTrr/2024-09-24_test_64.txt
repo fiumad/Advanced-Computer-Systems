@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 128 50':
+
+            318.55 msec task-clock                #    0.999 CPUs utilized          
+                 0      context-switches          #    0.000 /sec                   
+                 0      cpu-migrations            #    0.000 /sec                   
+           262,202      page-faults               #  823.114 K/sec                  
+     1,113,292,058      cycles                    #    3.495 GHz                    
+     1,409,280,922      instructions              #    1.27  insn per cycle         
+       263,686,655      branches                  #  827.775 M/sec                  
+           220,210      branch-misses             #    0.08% of all branches        
+
+       0.318886888 seconds time elapsed
+
+       0.059792000 seconds user
+       0.259098000 seconds sys
+
+

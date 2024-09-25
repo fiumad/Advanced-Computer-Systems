@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 4 50':
+
+          1,033.59 msec task-clock                #    0.992 CPUs utilized          
+               105      context-switches          #  101.587 /sec                   
+                 1      cpu-migrations            #    0.967 /sec                   
+           262,207      page-faults               #  253.685 K/sec                  
+     3,701,891,757      cycles                    #    3.582 GHz                    
+     9,979,616,928      instructions              #    2.70  insn per cycle         
+     2,345,332,601      branches                  #    2.269 G/sec                  
+           865,496      branch-misses             #    0.04% of all branches        
+
+       1.041699575 seconds time elapsed
+
+       0.794689000 seconds user
+       0.238406000 seconds sys
+
+
