@@ -1,0 +1,18 @@
+Cache-friendly sum: -2014260032
+Execution time: 0.022995 seconds
+
+Performance counter stats for './cache_miss_rate.o friendly':
+
+         3,773,289      cache-references                                              (64.98%)
+         2,599,738      cache-misses              #   68.898 % of all cache refs      (66.00%)
+       360,212,286      L1-dcache-loads                                               (67.87%)
+         2,646,027      L1-dcache-load-misses     #    0.73% of all L1-dcache accesses  (68.63%)
+           194,213      LLC-loads                                                     (67.15%)
+           107,699      LLC-load-misses           #   55.45% of all LL-cache accesses  (65.37%)
+
+       0.229581371 seconds time elapsed
+
+       0.208471000 seconds user
+       0.019667000 seconds sys
+
+

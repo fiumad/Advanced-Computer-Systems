@@ -1,5 +1,4 @@
 # Advanced Computer Systems - Project 1
-
 ## Results
 
 ### Experiment 1: Memory Latency

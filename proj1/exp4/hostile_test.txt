@@ -1,0 +1,18 @@
+Cache-hostile sum: -315244464
+Execution time: 0.137107 seconds
+
+Performance counter stats for './cache_miss_rate.o hostile':
+
+        31,636,485      cache-references                                              (66.17%)
+        21,284,211      cache-misses              #   67.277 % of all cache refs      (67.24%)
+       383,414,985      L1-dcache-loads                                               (67.34%)
+        19,115,876      L1-dcache-load-misses     #    4.99% of all L1-dcache accesses  (67.34%)
+        12,059,987      LLC-loads                                                     (66.49%)
+         8,398,083      LLC-load-misses           #   69.64% of all LL-cache accesses  (65.42%)
+
+       0.368244745 seconds time elapsed
+
+       0.344225000 seconds user
+       0.024015000 seconds sys
+
+
