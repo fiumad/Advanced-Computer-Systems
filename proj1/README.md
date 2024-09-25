@@ -1,11 +1,11 @@
 # Advanced Computer Systems - Project 1
 
-## How to Run
+## Results
 
+!(results)[./laptop_cpu_tests/byteSizeVSelapsed.png]
+
+
+##### How to Run (notes to self)
 ```bash
 sudo perf stat ./test.o <byte_size>
 ```
-
-## Results
-
-Test results for different byte sizes are in the `results` directory.
