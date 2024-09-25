@@ -14,8 +14,19 @@
 ### Experiment 4: Cache Miss Ratio Effect On Performance
 Two test cases were run for this experiment. First, a cache friendly program was run that sequentially accessed an array. The runtime and cache access statistics were recorded. The second test case was a cache unfriendly program that accessed the same array in a random order. The runtime and cache access statistics were recorded. The results are shown below.
 
+Cache Friendly Program:
+Total Cache Miss Ratio: **68.898%**
+LLC Cache Miss Ratio: **55.45%**
+Execution Time: **.022995 seconds**
 
+Cache Hostile Program:
+Total Cache Miss Ratio: **67.277%**
+LLC Cache Miss Ratio: **69.64%**
+Execution Time: **.368244 seconds**
 
+We can see that the cache friendly program has a lower cache miss ratio and a faster execution time compared to the cache hostile program.
+
+The LLC Cache Miss Ratio is especially important as the latency penalty for accessing RAM is much higher than the latency penalty incurred for missing at lower cache levels.
 
 ## Method
 
