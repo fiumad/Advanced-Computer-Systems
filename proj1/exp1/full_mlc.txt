@@ -1,0 +1,56 @@
+Intel(R) Memory Latency Checker - v3.11a
+*** Unable to modify prefetchers (try executing 'modprobe msr')
+*** So, enabling random access for latency measurements
+Measuring idle latencies for random access (in ns)...
+		Numa node
+Numa node	     0	
+       0	  77.9	
+
+Measuring Peak Injection Memory Bandwidths for the system
+Bandwidths are in MB/sec (1 MB/sec = 1,000,000 Bytes/sec)
+Using all the threads from each core if Hyper-threading is enabled
+Using traffic with the following read-write ratios
+ALL Reads        :	17602.0	
+3:1 Reads-Writes :	20384.0	
+2:1 Reads-Writes :	23013.0	
+1:1 Reads-Writes :	32980.6	
+Stream-triad like:	21714.6	
+
+Measuring Memory Bandwidths between nodes within system 
+Bandwidths are in MB/sec (1 MB/sec = 1,000,000 Bytes/sec)
+Using all the threads from each core if Hyper-threading is enabled
+Using Read-only traffic type
+		Numa node
+Numa node	     0	
+       0	17610.3	
+
+Measuring Loaded Latencies for the system
+Using all the threads from each core if Hyper-threading is enabled
+Using Read-only traffic type
+Inject	Latency	Bandwidth
+Delay	(ns)	MB/sec
+==========================
+ 00000	345.17	  17347.0
+ 00002	314.28	  17898.2
+ 00008	338.52	  18925.0
+ 00015	244.22	  21901.6
+ 00050	139.12	  31641.5
+ 00100	100.68	  28037.7
+ 00200	 82.05	  19680.5
+ 00300	 76.01	  14310.6
+ 00400	 75.88	  11141.2
+ 00500	 72.05	   9253.4
+ 00700	 70.67	   6970.7
+ 01000	 68.99	   5204.0
+ 01300	 70.33	   4223.3
+ 01700	 68.44	   3466.3
+ 02500	 68.92	   2654.2
+ 03500	 72.30	   2143.1
+ 05000	 72.62	   1741.6
+ 09000	 72.12	   1379.1
+ 20000	 74.79	   1063.8
+
+Measuring cache-to-cache transfer latency (in ns)...
+Local Socket L2->L2 HIT  latency	29.7
+Local Socket L2->L2 HITM latency	30.5
+
