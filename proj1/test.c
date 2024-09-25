@@ -1,13 +1,11 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define GIGABYTE (1024 * 1024 * 1024)
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <element_size_in_bytes>\n", argv[0]);
+int main(int argc, char *argv[]) { if (argc != 3) {
+        fprintf(stderr, "Usage: %s <element_size_in_bytes>, %s <read_ratio x 100>\n", argv[0], argv[1]);
         return 1;
     }
 
@@ -16,6 +14,13 @@ int main(int argc, char *argv[]) {
     if (element_size == 0) {
         fprintf(stderr, "Invalid element size. Must be a positive integer.\n");
         return 1;
+    }
+
+    // Get read ratio from the command-line argument
+    size_t read_ratio = (size_t)atoi(argv[2]);
+    if (read_ratio <= 0 || read_ratio > 100){
+      fprintf(stderr, "Invalid read ratio. Must be an integer between 0 and 100.\n");
+      return 1;
     }
 
     // Calculate the number of elements that fit in 1GB
@@ -28,6 +33,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    size_t read_elements = num_elements * (read_ratio / 100);
+
     // Writing to memory
     for (size_t i = 0; i < num_elements; i++) {
         memset((char *)memory + i * element_size, (char)(i % 256), element_size);
@@ -36,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     // Reading from memory
     size_t error_count = 0;
-    for (size_t i = 0; i < num_elements; i++) {
+    for (size_t i = 0; i < read_elements; i++) {
         char *element = (char *)memory + i * element_size;
         if (*element != (char)(i % 256)) {
             fprintf(stderr, "Memory error at element %zu\n", i);

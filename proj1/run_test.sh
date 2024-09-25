@@ -21,6 +21,6 @@ for i in {0..20}
     byte_size=$((byte_size*2))
     echo "Current byte size: $byte_size"
     echo 0 > /proc/sys/kernel/nmi_watchdog
-    perf stat ./test.o $byte_size 2> $test_file_name
+    perf stat ./test.o $byte_size 75 2> $test_file_name
     echo 1 > /proc/sys/kernel/nmi_watchdog
   done

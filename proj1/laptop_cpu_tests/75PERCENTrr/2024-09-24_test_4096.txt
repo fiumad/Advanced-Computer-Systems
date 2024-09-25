@@ -1,0 +1,18 @@
+
+ Performance counter stats for './test.o 8192 75':
+
+            342.93 msec task-clock                #    0.999 CPUs utilized          
+                 1      context-switches          #    2.916 /sec                   
+                 1      cpu-migrations            #    2.916 /sec                   
+           262,207      page-faults               #  764.602 K/sec                  
+     1,215,426,300      cycles                    #    3.544 GHz                    
+     1,113,050,978      instructions              #    0.92  insn per cycle         
+       196,218,535      branches                  #  572.178 M/sec                  
+           205,665      branch-misses             #    0.10% of all branches        
+
+       0.343235589 seconds time elapsed
+
+       0.079824000 seconds user
+       0.263421000 seconds sys
+
+
