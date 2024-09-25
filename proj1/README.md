@@ -11,6 +11,12 @@
 ![byteSizeVSelapsed.png](./laptop_cpu_tests_exp2/byteSizeVSelapsed50rr.png)
 ![byteSizeVSelapsed.png](./laptop_cpu_tests_exp2/byteSizeVSelapsed25rr.png)
 
+### Experiment 4: Cache Miss Ratio Effect On Performance
+Two test cases were run for this experiment. First, a cache friendly program was run that sequentially accessed an array. The runtime and cache access statistics were recorded. The second test case was a cache unfriendly program that accessed the same array in a random order. The runtime and cache access statistics were recorded. The results are shown below.
+
+
+
+
 ## Method
 
 1. To characterize the main memory latency when queue length is zero, I ... 
