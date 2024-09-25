@@ -30,6 +30,7 @@ def plot_data_pairs(data_pairs):
     # Add labels and title
     plt.xlabel('Byte Size')
     plt.ylabel('Time Elapsed (seconds)')
+    plt.suptitle('Intel i7-10850H')
     plt.xticks(byte_sizes)
     plt.xscale('log', base=2)
     plt.title('Performance: Byte Size vs Time Elapsed')
