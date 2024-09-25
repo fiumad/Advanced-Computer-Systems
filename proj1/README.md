@@ -3,7 +3,7 @@
 ## Results
 
 ### Experiment 1: Memory Latency
-1. The latency of the main memory is 78.6	ns as found by Inntel's Memory Latency Checker using the --idle_latency test.
+1. The latency of the main memory is **78.6	ns** as found by Intel's Memory Latency Checker using the --idle_latency test.
 
 ### Experiment 2: Memory Bandwidth
 #### Byte size vs. elapsed time for writing 1GB of data then reading 1 GB * read ratio of data.
