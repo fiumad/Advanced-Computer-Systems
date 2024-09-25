@@ -20,9 +20,3 @@
 ```bash
 2GB / 0.352861789 seconds = 5.67 GB/s (for 100% read ratio)
 ```
-
-
-##### How to Run (notes to self)
-```bash
-sudo perf stat ./test.o <byte_size>
-```
