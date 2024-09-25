@@ -17,7 +17,7 @@ byte_size=1
 # Final test should be 20
 for i in {0..20}
   do
-    test_file_name="./laptop_cpu_tests/${today_date}_test_${byte_size}.txt"
+    test_file_name="./laptop_cpu_tests_exp2/${today_date}_test_${byte_size}.txt"
     byte_size=$((byte_size*2))
     echo "Current byte size: $byte_size"
     echo 0 > /proc/sys/kernel/nmi_watchdog
