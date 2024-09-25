@@ -2,8 +2,8 @@
 
 ## Results
 
+### Byte size vs. elapsed time for writing then reading 1 GB of data.
 ![byteSizeVSelapsed.png](./laptop_cpu_tests/byteSizeVSelapsed.png)
-Byte size vs. elapsed time for writing then reading 1 GB of data.
 
 ## Method
 
