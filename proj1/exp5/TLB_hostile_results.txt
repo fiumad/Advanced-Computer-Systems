@@ -1,0 +1,12 @@
+ Performance counter stats for './cache_miss_rate.o hostile':
+
+     3,817,643,087      dTLB-loads                                                    (74.98%)
+        98,545,904      dTLB-load-misses          #    2.58% of all dTLB cache accesses  (75.04%)
+             2,442      iTLB-loads                                                    (75.04%)
+           305,055      iTLB-load-misses          # 12492.01% of all iTLB cache accesses  (74.94%)
+
+       3.733747049 seconds time elapsed
+
+       3.533536000 seconds user
+       0.200086000 seconds sys
+

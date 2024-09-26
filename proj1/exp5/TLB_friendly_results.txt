@@ -1,0 +1,14 @@
+Execution time: 0.229610 seconds
+
+ Performance counter stats for './cache_miss_rate.o friendly':
+
+     3,621,274,961      dTLB-loads                                                    (75.00%)
+           144,944      dTLB-load-misses          #    0.00% of all dTLB cache accesses  (74.99%)
+             1,665      iTLB-loads                                                    (75.00%)
+           399,062      iTLB-load-misses          # 23967.69% of all iTLB cache accesses  (75.02%)
+
+       2.192410696 seconds time elapsed
+
+       2.008412000 seconds user
+       0.184037000 seconds sys
+
