@@ -5,6 +5,12 @@
 #include <pthread.h>
 #include <time.h>
 
+struct matrix {
+    int **matrix;
+    int rows;
+    int cols;
+};
+
 int** generate_matrix(int rows, int cols, float sparsity, bool print) {
     // Dynamically allocate memory for a matrix of size rows x cols
     int **matrix = (int **)malloc(rows * sizeof(int *));
@@ -41,6 +47,17 @@ int** generate_matrix(int rows, int cols, float sparsity, bool print) {
     return matrix;
 }
 
+int** multiply_matrices_no_opt(int **a, int **b) {
+  if ()
+  for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+          for (int k = 0; k < cols; k++) {
+              c[i][j] += a[i][k] * b[k][j];
+          }
+      }
+  }
+}
+
 void free_matrix(int **matrix, int rows) {
     for (int i = 0; i < rows; i++) {
         free(matrix[i]);
@@ -75,8 +92,9 @@ int main() {
     }
 
   // Generate matrix based on input
-  int **matrix = generate_matrix(rows, cols, sparsity, true);
-  free_matrix(matrix, rows);
+  int **matrix1 = generate_matrix(rows, cols, sparsity, true);
+  int **matrix2 = generate_matrix(rows, cols, sparsity, true);
+  free_matrix(matrix1, rows);
 
     return 0;
 }
