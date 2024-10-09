@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <time.h>
 
-void generate_matrix(int rows, int cols, float sparsity) {
+int** generate_matrix(int rows, int cols, float sparsity, bool print) {
     // Dynamically allocate memory for a matrix of size rows x cols
     int **matrix = (int **)malloc(rows * sizeof(int *));
     for (int i = 0; i < rows; i++) {
@@ -29,24 +29,31 @@ void generate_matrix(int rows, int cols, float sparsity) {
     }
 
     // Print the matrix
-    printf("Generated matrix (%d x %d) with sparsity %.2f:\n", rows, cols, sparsity);
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
+    if (print){
+      printf("Generated matrix (%d x %d) with sparsity %.2f:\n", rows, cols, sparsity);
+      for (int i = 0; i < rows; i++) {
+          for (int j = 0; j < cols; j++) {
+              printf("%d ", matrix[i][j]);
+          }
+          printf("\n");
+      }
     }
+    return matrix;
+}
 
-    // Free allocated memory
+void free_matrix(int **matrix, int rows) {
     for (int i = 0; i < rows; i++) {
         free(matrix[i]);
     }
     free(matrix);
+    return;
 }
 
 int main() {
     int rows, cols;
     float sparsity;
+    int print_input;
+    bool print;
 
     // Input for matrix dimensions and sparsity
     printf("Enter the number of rows: ");
@@ -55,9 +62,21 @@ int main() {
     scanf("%d", &cols);
     printf("Enter the sparsity (0 to 1, where 0 is dense and 1 is all zeros): ");
     scanf("%f", &sparsity);
+    printf("Would you like to print matrices? (0 is no, 1 is yes)\n");
+    scanf("%d", &print_input);
+    if (print_input != 0 && print_input != 1){
+      printf("Invalid input. Please enter 0 or 1.\n");
+      return 1;
+    }
+    if(print == 1){
+      print = true;
+    } else {
+      print = false;
+    }
 
-    // Generate matrix based on input
-    generate_matrix(rows, cols, sparsity);
+  // Generate matrix based on input
+  int **matrix = generate_matrix(rows, cols, sparsity, true);
+  free_matrix(matrix, rows);
 
     return 0;
 }
