@@ -3,10 +3,11 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <time.h>
+#include <immintrin.h>  // For AVX intrinsics
 
 // Define the matrix struct
 struct matrix {
-    int **data;  // Pointer to the matrix
+    float **data;  // Pointer to the matrix
     int rows;    // Number of rows
     int cols;    // Number of columns
 };
@@ -30,9 +31,9 @@ struct matrix allocate_matrix(int rows, int cols) {
     struct matrix mat;
     mat.rows = rows;
     mat.cols = cols;
-    mat.data = (int **)malloc(rows * sizeof(int *));
+    mat.data = (float **)malloc(rows * sizeof(float *));
     for (int i = 0; i < rows; i++) {
-        mat.data[i] = (int *)malloc(cols * sizeof(int));
+        mat.data[i] = (float *)malloc(cols * sizeof(float));
     }
     return mat;
 }
@@ -41,7 +42,7 @@ struct matrix allocate_matrix(int rows, int cols) {
 void print_matrix(struct matrix mat) {
     for (int i = 0; i < mat.rows; i++) {
         for (int j = 0; j < mat.cols; j++) {
-            printf("%d ", mat.data[i][j]);
+            printf("%f ", mat.data[i][j]);
         }
         printf("\n");
     }
@@ -54,9 +55,9 @@ struct matrix generate_matrix(int rows, int cols, float sparsity, bool print) {
     mat.cols = cols;
 
     // Dynamically allocate memory for the matrix
-    mat.data = (int **)malloc(rows * sizeof(int *));
+    mat.data = (float **)malloc(rows * sizeof(float *));
     for (int i = 0; i < rows; i++) {
-        mat.data[i] = (int *)malloc(cols * sizeof(int));
+        mat.data[i] = (float *)malloc(cols * sizeof(float));
     }
 
     // Fill matrix with values based on sparsity
@@ -82,8 +83,6 @@ struct matrix generate_matrix(int rows, int cols, float sparsity, bool print) {
 
 // Function to multiply two matrices without optimizations
 struct matrix multiply_matrices_no_opt(struct matrix a, struct matrix b) {
-    //start the clock
-    clock_t start = clock();
     // Check if the multiplication is valid
     if (a.cols != b.rows) {
         printf("Error: Incompatible matrix dimensions for multiplication.\n");
@@ -103,9 +102,6 @@ struct matrix multiply_matrices_no_opt(struct matrix a, struct matrix b) {
             }
         }
     }
-    //stop the clock
-    clock_t end = clock();
-    printf("Elapsed time (no optimization): %f seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
     return result;
 }
 
@@ -158,6 +154,46 @@ struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b){
     return result;
 }
 
+// SIMD-based matrix multiplication (for matrices with float data type)
+struct matrix multiply_matrices_simd(struct matrix a, struct matrix b) {
+    // Check if multiplication is possible
+    if (a.cols != b.rows) {
+        printf("Error: Incompatible matrix dimensions for multiplication.\n");
+        exit(1);
+    }
+
+    // Allocate result matrix (a.rows x b.cols)
+    struct matrix result = allocate_matrix(a.rows, b.cols);
+
+    // Perform matrix multiplication using AVX2 intrinsics (float data type)
+    for (int i = 0; i < a.rows; i++) {
+        for (int j = 0; j < b.cols; j++) {
+            // Initialize the result value to 0
+            __m256 sum = _mm256_setzero_ps();
+
+            // Multiply in blocks of 8 floats using SIMD
+            for (int k = 0; k < a.cols; k += 8) {
+                // Load 8 elements from matrix A and B
+                __m256 a_vals = _mm256_loadu_ps(&a.data[i][k]);
+                __m256 b_vals = _mm256_loadu_ps(&b.data[k][j]);
+
+                // Perform the multiplication and accumulate the result
+                __m256 mul_vals = _mm256_mul_ps(a_vals, b_vals);
+                sum = _mm256_add_ps(sum, mul_vals);
+            }
+
+            // Store the result back to the result matrix
+            // (Summing the 8 packed floats to a single float result)
+            float result_vals[8];
+            _mm256_storeu_ps(result_vals, sum);
+            result.data[i][j] = result_vals[0] + result_vals[1] + result_vals[2] + result_vals[3] +
+                                result_vals[4] + result_vals[5] + result_vals[6] + result_vals[7];
+        }
+    }
+
+    return result;
+}
+
 // Function to free the memory of a matrix struct
 void free_matrix(struct matrix mat) {
     for (int i = 0; i < mat.rows; i++) {
@@ -170,8 +206,7 @@ void free_matrix(struct matrix mat) {
 int main() {
     int rows, cols;
     float sparsity;
-    int print_input;
-    bool print, opt, multithread;
+    int print, opt, multithread, simd;
 
     srand(time(NULL));  // Seed random number generator
 
@@ -185,19 +220,14 @@ int main() {
     printf("Enter the sparsity (0 to 1, where 0 is dense and 1 is all zeros): ");
     scanf("%f", &sparsity);
     printf("Would you like to print matrices? (0 is no, 1 is yes)\n");
-    scanf("%d", &print_input);
+    scanf("%d", &print);
     printf("Multiply with no optimization? (0 is no, 1 is yes)\n");
     scanf("%d", &opt);
     printf("Multiply with multithreading only? (0 is no, 1 is yes)\n");
     scanf("%d", &multithread);
-    //printf("Multiply with multithreading only? (0 is no, 1 is yes)\n");
-    //scanf("%d", &multithread);
+    printf("Multiply with SIMD only? (0 is no, 1 is yes)\n");
+    scanf("%d", &simd);
 
-    if (print_input == 1) {
-        print = true;
-    } else {
-        print = false;
-    }
     // Generate two matrices based on input
     printf("# of rows: %d\n", rows);
     printf("# of cols: %d\n", cols);
@@ -242,6 +272,25 @@ int main() {
 
       free_matrix(result_matrix2);
     }
+
+  if (simd){
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+
+      struct matrix result_matrix3 = multiply_matrices_simd(matrix1, matrix2);
+
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+
+      double elapsed_time = get_elapsed_time(start_time, end_time);
+      printf("Matrix multiplication took %.12f seconds (SIMD only).\n", elapsed_time);
+
+      if (print) {
+        printf("Result matrix:\n");
+        print_matrix(result_matrix3);
+      }
+
+      free_matrix(result_matrix3);
+  }
+
 
     // Free all matrices
     free_matrix(matrix1);
