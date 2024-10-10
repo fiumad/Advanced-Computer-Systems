@@ -19,6 +19,13 @@ struct thread_args {
     int row;               // Row number to compute
 };
 
+// Function to get the elapsed time in seconds
+double get_elapsed_time(struct timespec start, struct timespec end) {
+    double start_sec = start.tv_sec + start.tv_nsec / 1e9;
+    double end_sec = end.tv_sec + end.tv_nsec / 1e9;
+    return end_sec - start_sec;
+}
+
 struct matrix allocate_matrix(int rows, int cols) {
     struct matrix mat;
     mat.rows = rows;
@@ -28,6 +35,16 @@ struct matrix allocate_matrix(int rows, int cols) {
         mat.data[i] = (int *)malloc(cols * sizeof(int));
     }
     return mat;
+}
+
+// Function to print a matrix
+void print_matrix(struct matrix mat) {
+    for (int i = 0; i < mat.rows; i++) {
+        for (int j = 0; j < mat.cols; j++) {
+            printf("%d ", mat.data[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 // Function to generate a matrix dynamically and return it as a matrix struct
@@ -57,12 +74,7 @@ struct matrix generate_matrix(int rows, int cols, float sparsity, bool print) {
     // Print the matrix if requested
     if (print) {
         printf("Generated matrix (%d x %d) with sparsity %.2f:\n", rows, cols, sparsity);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                printf("%d ", mat.data[i][j]);
-            }
-            printf("\n");
-        }
+        print_matrix(mat);
     }
 
     return mat;
@@ -159,9 +171,11 @@ int main() {
     int rows, cols;
     float sparsity;
     int print_input;
-    bool print;
+    bool print, opt, multithread;
 
     srand(time(NULL));  // Seed random number generator
+
+    struct matrix a = generate_matrix(3, 3, 0.5, true);
 
     // Input for matrix dimensions and sparsity
     printf("Enter the number of rows: ");
@@ -172,40 +186,66 @@ int main() {
     scanf("%f", &sparsity);
     printf("Would you like to print matrices? (0 is no, 1 is yes)\n");
     scanf("%d", &print_input);
+    printf("Multiply with no optimization? (0 is no, 1 is yes)\n");
+    scanf("%d", &opt);
+    printf("Multiply with multithreading only? (0 is no, 1 is yes)\n");
+    scanf("%d", &multithread);
+    //printf("Multiply with multithreading only? (0 is no, 1 is yes)\n");
+    //scanf("%d", &multithread);
 
     if (print_input == 1) {
         print = true;
     } else {
         print = false;
     }
-
     // Generate two matrices based on input
-    struct matrix matrix1 = generate_matrix(rows, cols, sparsity, print);
-    struct matrix matrix2 = generate_matrix(cols, rows, sparsity, print);  // Note: cols of matrix1 must equal rows of matrix2
-    /*
-    // Multiply the matrices
-    struct matrix result_matrix = multiply_matrices_no_opt(matrix1, matrix2);
+    printf("# of rows: %d\n", rows);
+    printf("# of cols: %d\n", cols);
+    struct matrix matrix1 = generate_matrix(cols, cols, sparsity, print);
+    struct matrix matrix2 = generate_matrix(cols, cols, sparsity, print);  // Note: cols of matrix1 must equal rows of matrix2
 
-    // Print the result matrix
-    if (print) {
-        printf("Result of matrix multiplication:\n");
-        for (int i = 0; i < result_matrix.rows; i++) {
-            for (int j = 0; j < result_matrix.cols; j++) {
-                printf("%d ", result_matrix.data[i][j]);
-            }
-            printf("\n");
-        }
+    //measure the time it takes to multiply the matrices
+    struct timespec start_time, end_time;
+
+    if(opt){
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+
+      // Multiply the matrices with no optimization
+      struct matrix result_matrix = multiply_matrices_no_opt(matrix1, matrix2);
+
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+
+      printf("Matrix multiplication took %.12f seconds (No optimization).\n", get_elapsed_time(start_time, end_time));
+
+      // Print the result matrix
+      if (print) {
+        printf("Result matrix:\n");
+        print_matrix(result_matrix);
+      }
+      free_matrix(result_matrix);
     }
-    */
-    clock_t start = clock();
-    struct matrix result_matrix2 = multiply_matrices_multithread(matrix1, matrix2);
-    clock_t end = clock();
-    printf("Elapsed time (multithreading only): %f seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    if (multithread){
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+
+      struct matrix result_matrix2 = multiply_matrices_multithread(matrix1, matrix2);
+
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+
+      double elapsed_time = get_elapsed_time(start_time, end_time);
+      printf("Matrix multiplication took %.12f seconds (Multithreaded only).\n", elapsed_time);
+
+      if (print) {
+        printf("Result matrix:\n");
+        print_matrix(result_matrix2);
+      }
+
+      free_matrix(result_matrix2);
+    }
 
     // Free all matrices
     free_matrix(matrix1);
     free_matrix(matrix2);
-    free_matrix(result_matrix2);
 
     return 0;
 }
