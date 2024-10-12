@@ -187,7 +187,89 @@ void *multiply_thread_simd(void *arg) {
     return NULL;
 }
 
-struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b, int num_threads, int simd) {
+void *multiply_thread_block(void *arg) {
+    struct thread_args *args = (struct thread_args *)arg;
+    struct matrix *a = args->a;
+    struct matrix *b = args->b;
+    struct matrix *result = args->result;
+    int start_row = args->start_row;
+    int end_row = args->end_row;
+
+    int BLOCK_SIZE = 64;
+
+    // Block multiplication
+    for (int bi = start_row; bi < end_row; bi += BLOCK_SIZE) {
+        for (int bj = 0; bj < b->cols; bj += BLOCK_SIZE) {
+            for (int bk = 0; bk < a->cols; bk += BLOCK_SIZE) {
+                // Iterate within each block
+                for (int i = bi; i < bi + BLOCK_SIZE && i < end_row; i++) {
+                    for (int j = bj; j < bj + BLOCK_SIZE && j < b->cols; j++) {
+                        float sum = 0;
+                        for (int k = bk; k < bk + BLOCK_SIZE && k < a->cols; k++) {
+                            if (a->data[i][k] != 0) {  // Skip zero entries in 'a'
+                                sum += a->data[i][k] * b->data[k][j];
+                            }
+                        }
+                        result->data[i][j] += sum;
+                    }
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+void *multiply_thread_blocksimd(void *arg) {
+    struct thread_args *args = (struct thread_args *)arg;
+    struct matrix *a = args->a;
+    struct matrix *b = args->b;
+    struct matrix *result = args->result;
+    int start_row = args->start_row;
+    int end_row = args->end_row;
+
+    // Define block size for blocking
+    int BLOCK_SIZE = 64;
+
+    // Iterate over blocks of the result matrix
+    for (int bi = start_row; bi < end_row; bi += BLOCK_SIZE) {
+        for (int bj = 0; bj < b->cols; bj += BLOCK_SIZE) {
+            for (int bk = 0; bk < a->cols; bk += BLOCK_SIZE) {
+
+                // Iterate within each block
+                for (int i = bi; i < bi + BLOCK_SIZE && i < end_row; i++) {
+                    for (int j = bj; j < bj + BLOCK_SIZE && j < b->cols; j++) {
+                        __m256 result_vec = _mm256_setzero_ps();  // SIMD result vector (8 floats)
+
+                        // Loop over the 'k' dimension in blocks and use SIMD for multiplication
+                        for (int k = bk; k < bk + BLOCK_SIZE && k < a->cols; k += 8) {  // Process 8 elements at a time
+
+                            // Skip zero entries in matrix 'a' (only process non-zero elements)
+                            if (a->data[i][k] != 0) {
+                                // Load 8 elements from matrix 'a' and matrix 'b'
+                                __m256 a_vec = _mm256_loadu_ps(&a->data[i][k]);
+                                __m256 b_vec = _mm256_loadu_ps(&b->data[k][j]);
+
+                                // Perform fused multiply-add (result_vec += a_vec * b_vec)
+                                __m256 mul_vec = _mm256_mul_ps(a_vec, b_vec);
+                                result_vec = _mm256_add_ps(result_vec, mul_vec);
+                            }
+                        }
+
+                        // Sum up the 8 elements in the SIMD register and store them in the result matrix
+                        float temp[8];
+                        _mm256_storeu_ps(temp, result_vec);
+                        for (int t = 0; t < 8; t++) {
+                            result->data[i][j] += temp[t];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b, int num_threads, int simd, int block) {
     // Check if multiplication is possible
     if (a.cols != b.rows) {
         printf("Error: Incompatible matrix dimensions for multiplication.\n");
@@ -219,7 +301,9 @@ struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b, in
         targs[i].result = &result;
         targs[i].start_row = start_row;
         targs[i].end_row = end_row;
-        if (simd) {pthread_create(&threads[i], NULL, multiply_thread_simd, (void *)&targs[i]);}
+        if (block && !simd) {pthread_create(&threads[i], NULL, multiply_thread_block, (void *)&targs[i]);}
+        if (simd && !block) {pthread_create(&threads[i], NULL, multiply_thread_simd, (void *)&targs[i]);}
+        if (simd && block) {pthread_create(&threads[i], NULL, multiply_thread_blocksimd, (void *)&targs[i]);}
         else{pthread_create(&threads[i], NULL, multiply_thread, (void *)&targs[i]);}
     }
 
@@ -287,8 +371,9 @@ int main() {
 
     srand(time(NULL));  // Seed random number generator
 
-    struct matrix a = generate_matrix(3, 3, 0.5, true);
+    //struct matrix a = generate_matrix(3, 3, 0.5, true);
 
+    /*
     // Input for matrix dimensions and sparsity
     printf("Enter the number of rows: ");
     scanf("%d", &rows);
@@ -372,6 +457,36 @@ int main() {
     // Free all matrices
     free_matrix(matrix1);
     free_matrix(matrix2);
+
+    */
+
+    struct timespec start_time, end_time;
+    //vary size and sparsity
+    int n;
+    float s;
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        switch (i) {
+          case 0: n = 1000; break;
+          case 1: n = 5000; break;
+          case 2: n = 10000; break;
+        }
+        switch (j) {
+          case 0: s = 0.01; break;
+          case 1: s = 0.05; break;
+          case 2: s = 0.1; break;
+        }
+ 
+        printf("Multiplying with... n: %d, sparsity: %.2f\n", n, s);
+        struct matrix a = generate_matrix(n, n, s, 0);
+        struct matrix b = generate_matrix(n, n, s, 0);
+        struct matrix result_matrix;
+        clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+        result_matrix = multiply_matrices_multithread(a, b, 24, 1, 1);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+        printf("Matrix multiplication took %.12f seconds (Using SIMD Only).\n", get_elapsed_time(start_time, end_time));
+      }
+    }
 
     return 0;
 }
