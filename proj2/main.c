@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <time.h>
+#include <math.h>
 #include <immintrin.h>  // For AVX intrinsics
 
 // Define the matrix struct
@@ -17,7 +18,8 @@ struct thread_args {
     struct matrix *a;      // Matrix A
     struct matrix *b;      // Matrix B
     struct matrix *result; // Result matrix
-    int row;               // Row number to compute
+    int start_row;         // Row number to compute
+    int end_row;
 };
 
 // Function to get the elapsed time in seconds
@@ -46,6 +48,26 @@ void print_matrix(struct matrix mat) {
         }
         printf("\n");
     }
+}
+
+bool compare_matrices(struct matrix a, struct matrix b, float tolerance) {
+    // Check if the dimensions are the same
+    if (a.rows != b.rows || a.cols != b.cols) {
+        printf("Matrices have different dimensions.\n");
+        return false;
+    }
+
+    // Compare each element within the tolerance range
+    for (int i = 0; i < a.rows; i++) {
+        for (int j = 0; j < a.cols; j++) {
+            if (fabs(a.data[i][j] - b.data[i][j]) > tolerance) {
+                printf("Matrices differ at element [%d][%d]: %.2f vs %.2f\n", i, j, a.data[i][j], b.data[i][j]);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 // Function to generate a matrix dynamically and return it as a matrix struct
@@ -105,25 +127,28 @@ struct matrix multiply_matrices_no_opt(struct matrix a, struct matrix b) {
     return result;
 }
 
-void *multiply_row(void *args) {
+void *multiply_thread(void *args) {
     struct thread_args *targs = (struct thread_args *)args;
     struct matrix *a = targs->a;
     struct matrix *b = targs->b;
     struct matrix *result = targs->result;
-    int row = targs->row;
-
+    int start_row = targs->start_row;
+    int end_row = targs->end_row;
+ 
     // Compute the row of the result matrix
-    for (int j = 0; j < b->cols; j++) {
-        result->data[row][j] = 0;
-        for (int k = 0; k < a->cols; k++) {
-            result->data[row][j] += a->data[row][k] * b->data[k][j];
-        }
+    for (int i = start_row; i < end_row; i++) {
+      for (int j = 0; j < b->cols; j++) {
+          result->data[i][j] = 0;
+          for (int k = 0; k < a->cols; k++) {
+              result->data[i][j] += a->data[i][k] * b->data[k][j];
+          }
+      }
     }
 
     pthread_exit(NULL);
 }
 
-struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b){
+struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b, int num_threads) {
     // Check if multiplication is possible
     if (a.cols != b.rows) {
         printf("Error: Incompatible matrix dimensions for multiplication.\n");
@@ -133,21 +158,33 @@ struct matrix multiply_matrices_multithread(struct matrix a, struct matrix b){
     // Allocate result matrix (a.rows x b.cols)
     struct matrix result = allocate_matrix(a.rows, b.cols);
 
+    int rows_per_thread = a.rows / num_threads;
+    int remaining_rows = a.rows % num_threads;
+
+
     // Create an array of threads and thread arguments
-    pthread_t threads[a.rows];
-    struct thread_args targs[a.rows];
+    pthread_t threads[num_threads];
+    struct thread_args targs[num_threads];
 
     // Create threads to compute each row of the result matrix
-    for (int i = 0; i < a.rows; i++) {
+    for (int i = 0; i < num_threads; i++) {
+        int start_row = i * rows_per_thread;
+        int end_row = start_row + rows_per_thread;
+
+        if (i == num_threads - 1) {  // Last thread handles remaining rows
+            end_row += remaining_rows;
+        }
+
         targs[i].a = &a;
         targs[i].b = &b;
         targs[i].result = &result;
-        targs[i].row = i;
-        pthread_create(&threads[i], NULL, multiply_row, (void *)&targs[i]);
+        targs[i].start_row = start_row;
+        targs[i].end_row = end_row;
+        pthread_create(&threads[i], NULL, multiply_thread, (void *)&targs[i]);
     }
 
     // Wait for all threads to finish
-    for (int i = 0; i < a.rows; i++) {
+    for (int i = 0; i < num_threads; i++) {
         pthread_join(threads[i], NULL);
     }
 
@@ -206,7 +243,7 @@ void free_matrix(struct matrix mat) {
 int main() {
     int rows, cols;
     float sparsity;
-    int print, opt, multithread, simd;
+    int print, opt, multithread, simd, num_threads;
 
     srand(time(NULL));  // Seed random number generator
 
@@ -225,15 +262,21 @@ int main() {
     scanf("%d", &opt);
     printf("Multiply with multithreading only? (0 is no, 1 is yes)\n");
     scanf("%d", &multithread);
+    if (multithread){
+      printf("Enter the number of threads: ");
+      scanf("%d", &num_threads);
+    }
     printf("Multiply with SIMD only? (0 is no, 1 is yes)\n");
     scanf("%d", &simd);
 
     // Generate two matrices based on input
     printf("# of rows: %d\n", rows);
     printf("# of cols: %d\n", cols);
-    struct matrix matrix1 = generate_matrix(cols, cols, sparsity, print);
-    struct matrix matrix2 = generate_matrix(cols, cols, sparsity, print);  // Note: cols of matrix1 must equal rows of matrix2
-
+    struct matrix matrix1 = generate_matrix(rows, cols, sparsity, print);
+    struct matrix matrix2 = generate_matrix(rows, cols, sparsity, print);  // Note: cols of matrix1 must equal rows of matrix2
+    struct matrix result_matrix;
+    struct matrix result_matrix2;
+    struct matrix result_matrix3;
     //measure the time it takes to multiply the matrices
     struct timespec start_time, end_time;
 
@@ -241,7 +284,7 @@ int main() {
       clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
 
       // Multiply the matrices with no optimization
-      struct matrix result_matrix = multiply_matrices_no_opt(matrix1, matrix2);
+      result_matrix = multiply_matrices_no_opt(matrix1, matrix2);
 
       clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
 
@@ -252,13 +295,12 @@ int main() {
         printf("Result matrix:\n");
         print_matrix(result_matrix);
       }
-      free_matrix(result_matrix);
     }
 
     if (multithread){
       clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
 
-      struct matrix result_matrix2 = multiply_matrices_multithread(matrix1, matrix2);
+      result_matrix2 = multiply_matrices_multithread(matrix1, matrix2, num_threads);
 
       clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
 
@@ -269,14 +311,12 @@ int main() {
         printf("Result matrix:\n");
         print_matrix(result_matrix2);
       }
-
-      free_matrix(result_matrix2);
     }
 
   if (simd){
       clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
 
-      struct matrix result_matrix3 = multiply_matrices_simd(matrix1, matrix2);
+      result_matrix3 = multiply_matrices_simd(matrix1, matrix2);
 
       clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
 
@@ -287,14 +327,20 @@ int main() {
         printf("Result matrix:\n");
         print_matrix(result_matrix3);
       }
-
-      free_matrix(result_matrix3);
   }
 
 
     // Free all matrices
     free_matrix(matrix1);
     free_matrix(matrix2);
+
+  if (opt && multithread){
+    printf("Results match? %d\n", compare_matrices(result_matrix, result_matrix2, 0.0001));
+  }
+
+  if (opt) { free_matrix(result_matrix); }
+  if (multithread) { free_matrix(result_matrix2); }
+  if (simd) { free_matrix(result_matrix3); }
 
     return 0;
 }
