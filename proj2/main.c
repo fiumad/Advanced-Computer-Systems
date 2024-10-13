@@ -86,7 +86,7 @@ struct matrix generate_matrix(int rows, int cols, float sparsity, bool print) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             float random_val = (float)rand() / RAND_MAX;
-            if (random_val < sparsity) {
+            if (random_val > sparsity) {
                 mat.data[i][j] = 0; // Set to 0 based on sparsity
             } else {
                 mat.data[i][j] = rand() % 100 + 1; // Random value between 1 and 100
@@ -124,6 +124,44 @@ struct matrix multiply_matrices_no_opt(struct matrix a, struct matrix b) {
             }
         }
     }
+    return result;
+}
+
+struct matrix multiply_matrices_block(struct matrix a, struct matrix b, int block_size) {
+    // Check if the multiplication is valid
+    if (a.cols != b.rows) {
+        printf("Error: Incompatible matrix dimensions for multiplication.\n");
+        exit(1);  // Exit with error if dimensions don't match
+    }
+
+    // Result matrix (a.rows x b.cols)
+    struct matrix result = allocate_matrix(a.rows, b.cols);
+
+    // Initialize result matrix to zero
+    for (int i = 0; i < result.rows; i++) {
+        for (int j = 0; j < result.cols; j++) {
+            result.data[i][j] = 0;
+        }
+    }
+    // Block multiplication
+    for (int i = 0; i < a.rows; i += block_size) {
+        for (int j = 0; j < b.cols; j += block_size) {
+            for (int k = 0; k < a.cols; k += block_size) {
+                // Multiply sub-blocks
+                for (int bi = i; bi < i + block_size && bi < a.rows; bi++) {
+                    for (int bj = j; bj < j + block_size && bj < b.cols; bj++) {
+                        for (int bk = k; bk < k + block_size && bk < a.cols; bk++) {
+                            // Skip unnecessary calculations if the entry is zero (optional optimization for sparse matrices)
+                            if (a.data[bi][bk] != 0 && b.data[bk][bj] != 0) {
+                                result.data[bi][bj] += a.data[bi][bk] * b.data[bk][bj];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return result;
 }
 
@@ -196,7 +234,6 @@ void *multiply_thread_block(void *arg) {
     int end_row = args->end_row;
 
     int BLOCK_SIZE = 64;
-
     // Block multiplication
     for (int bi = start_row; bi < end_row; bi += BLOCK_SIZE) {
         for (int bj = 0; bj < b->cols; bj += BLOCK_SIZE) {
@@ -367,7 +404,7 @@ void free_matrix(struct matrix mat) {
 int main() {
     int rows, cols;
     float sparsity;
-    int print, opt, multithread, simd, num_threads;
+    int print, opt, multithread, simd, num_threads, sparse;
 
     srand(time(NULL));  // Seed random number generator
 
@@ -459,24 +496,30 @@ int main() {
     free_matrix(matrix2);
 
     */
+    int combo;
+    printf("Would you like to use Dense x Dense matrices? (0 is no, 1 is yes, dense x sparse is 2)\n");
+    scanf("%d", &sparse);
+
+    printf("Would you like to test all combinations of optimization? (1 for yes)\n");
+    scanf("%d", &combo);
 
     struct timespec start_time, end_time;
     //vary size and sparsity
     int n;
     float s;
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        switch (i) {
-          case 0: n = 1000; break;
-          case 1: n = 5000; break;
-          case 2: n = 10000; break;
+  if(sparse == 0){
+    for (int i = 0; i < 8; i++) {
+       switch (i) {
+          case 0: n = 100; break; //if random value > s then set to 0
+          case 1: n = 200; break;
+          case 2: n = 300; break;
+          case 3: n = 400; break;
+          case 4: n = 500; break;
+          case 5: n = 600; break;
+          case 6: n = 700; break;
+          case 7: n = 800; break;
         }
-        switch (j) {
-          case 0: s = 0.01; break;
-          case 1: s = 0.05; break;
-          case 2: s = 0.1; break;
-        }
- 
+        s = .1;
         printf("Multiplying with... n: %d, sparsity: %.2f\n", n, s);
         struct matrix a = generate_matrix(n, n, s, 0);
         struct matrix b = generate_matrix(n, n, s, 0);
@@ -484,10 +527,137 @@ int main() {
         clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
         result_matrix = multiply_matrices_multithread(a, b, 24, 1, 1);
         clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
-        printf("Matrix multiplication took %.12f seconds (Using SIMD Only).\n", get_elapsed_time(start_time, end_time));
+        printf("Matrix multiplication took %.12f seconds (Using ALL optimizations).\n", get_elapsed_time(start_time, end_time));
       }
     }
+  if (sparse == 2){
+    float dense;
+    dense = .9;
+    n = 2000;
+    for (float i = 0; i < .5; i += .05){
+      printf("Multiplying with... n: %d, sparsity: %.2f\n", n, i);
+      struct matrix a = generate_matrix(n, n, i, 0);
+      struct matrix b = generate_matrix(n, n, dense, 0);
+      struct matrix result_matrix;
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+      result_matrix = multiply_matrices_multithread(a, b, 24, 1, 1);
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+      printf("Matrix multiplication took %.12f seconds (Using ALL optimizations).\n", get_elapsed_time(start_time, end_time));
+    }
+  }
+  if (sparse == 3){
+    float dense;
+    dense = .9;
+    s = .1;
+    for (int n = 0; n < 5000; n += 500){
+      printf("Multiplying with... n: %d, sparsity: %.2f\n", n, s);
+      struct matrix a = generate_matrix(n, n, s, 0);
+      struct matrix b = generate_matrix(n, n, dense, 0);
+      struct matrix result_matrix;
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+      result_matrix = multiply_matrices_multithread(a, b, 24, 1, 1);
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+      printf("Matrix multiplication took %.12f seconds (Using ALL optimizations).\n", get_elapsed_time(start_time, end_time));
+    }
+  }
+  if (combo){
+    printf("Testing all combinations of optimizations\n");
+    int n1, n2;
+    n1 = 1000;
+    n2 = 2000;
+    struct matrix a = generate_matrix(n1, n1, .1, 0);
+    struct matrix b = generate_matrix(n1, n1, .1, 0);
+    struct matrix c = generate_matrix(n2, n2, .2, 0);
+    struct matrix d = generate_matrix(n2, n2, .2, 0);
+    struct matrix result;
 
-    return 0;
+    printf("Beginning tests\n");
+    for (int i = 0; i < 8; i++){
+      printf("Testing combination %d\n", i);
+      switch (i) {
+        case 0:
+          printf("Multiplying a,b with no optimization.\n"); 
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_no_opt(a, b);
+          break;
+        case 1:
+          printf("Multiplying a,b with cache miss optimization.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_block(a,b, 64);
+          break;
+        case 2:
+          printf("Multiplying a,b with SIMD only.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_simd(a,b); break;
+        case 3:
+          printf("Multiplying a,b with SIMD and cache miss optimization.\n");
+          result = multiply_matrices_multithread(a,b,1,1,1); break; //simd blocking only (since only using one thread to complete)
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+        case 4:
+          printf("Multiplying a,b with multithreading only.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_multithread(a,b,24,0,0); break;
+        case 5:
+          printf("Multiplying a,b with multithreading and cache miss optimization.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_multithread(a,b,24,0,1); break;
+        case 6:
+          printf("Multiplying a,b with multithreading and SIMD.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_multithread(a,b,24,1,0); break;
+        case 7:
+          printf("Multiplying a,b with ALL optimizations.\n");
+          clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+          result = multiply_matrices_multithread(a,b,24,1,1); break;
+      }
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+      printf("Matrix multiplication took %.12f seconds (Combination %d).\n", get_elapsed_time(start_time, end_time), i);
+      free_matrix(result);
+
+
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+      switch (i) {
+        case 0: result = multiply_matrices_no_opt(c, d); break;
+        case 1: result = multiply_matrices_block(c,d, 64); break;
+        case 2: result = multiply_matrices_simd(c,d); break;
+        case 3: result = multiply_matrices_multithread(c,d,1,1,1); break; //simd blocking only (since only using one thread to complete)
+        case 4: result = multiply_matrices_multithread(c,d,24,0,0); break;
+        case 5: result = multiply_matrices_multithread(c,d,24,0,1); break;
+        case 6: result = multiply_matrices_multithread(c,d,24,1,0); break;
+        case 7: result = multiply_matrices_multithread(c,d,24,1,1); break;
+      }
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+      printf("Matrix multiplication took %.12f seconds (Combination %d).\n", get_elapsed_time(start_time, end_time), i);
+    }
+    free_matrix(c);
+    free_matrix(d);
+    free_matrix(result);
+  }
+  else {
+    for (int i = 0; i < 7; i++) {
+      s = .9;
+      switch (i) {
+        case 0: n = 500; break; //if random value > s then set to 0
+        case 1: n = 1000; break;
+        case 2: n = 1500; break;
+        case 3: n = 2000; break;
+        case 4: n = 2500; break;
+        case 5: n = 3000; break;
+        case 6: n = 3500; break;
+      }
+      printf("Multiplying with... n: %d, sparsity: %.2f\n", n, s);
+      struct matrix a = generate_matrix(n, n, s, 0);
+      struct matrix b = generate_matrix(n, n, s, 0);
+      struct matrix result_matrix;
+      clock_gettime(CLOCK_MONOTONIC, &start_time);  // Start time
+      result_matrix = multiply_matrices_multithread(a, b, 24, 1, 1);
+      clock_gettime(CLOCK_MONOTONIC, &end_time);  // End time
+      printf("Matrix multiplication took %.12f seconds (Using ALL optimizations).\n", get_elapsed_time(start_time, end_time));
+    }
+  }
+
+
+
+  return 0;
 }
 

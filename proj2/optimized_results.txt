@@ -1,0 +1,18 @@
+Multiplying with... n: 1000, sparsity: 0.10
+Matrix multiplication took 0.019443169935 seconds (Using ALL optimizations).
+Multiplying with... n: 1000, sparsity: 0.05
+Matrix multiplication took 0.018005697988 seconds (Using ALL optimizations).
+Multiplying with... n: 1000, sparsity: 0.01
+Matrix multiplication took 0.017643259023 seconds (Using ALL optimizations).
+Multiplying with... n: 5000, sparsity: 0.10
+Matrix multiplication took 2.224199756049 seconds (Using ALL optimizations).
+Multiplying with... n: 5000, sparsity: 0.05
+Matrix multiplication took 2.214153082925 seconds (Using ALL optimizations).
+Multiplying with... n: 5000, sparsity: 0.01
+Matrix multiplication took 2.179303396028 seconds (Using ALL optimizations).
+Multiplying with... n: 10000, sparsity: 0.10
+Matrix multiplication took 19.414860861027 seconds (Using ALL optimizations).
+Multiplying with... n: 10000, sparsity: 0.05
+Matrix multiplication took 17.784685431048 seconds (Using ALL optimizations).
+Multiplying with... n: 10000, sparsity: 0.01
+Matrix multiplication took 17.504243006115 seconds (Using ALL optimizations).
