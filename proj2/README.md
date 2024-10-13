@@ -21,5 +21,15 @@ To run the project, execute main.o
 - All 8 combinations of optimization methods were applied to N1,S1 and N2,S2. The results are shown below.
   - N1,S1: 1000x1000, sparsity = .1
   - N2,S2: 2000x2000, sparsity = .2
+- Overlapping on the category labels obscure some information about each configuration. If each bar is assigned a binary number starting at 0, the 0th bit corresponds to multithreading, the 1st bit corresponds to SIMD, and the 2nd bit corresponds to cache blocking.
+- Clearly, SIMD is the most important optimization method
+- After this, multithreading provides the most speedup
+- Cache blocking provides the least speedup most likely because the run time is dominated by number of operations rather than memory latency
+- Size is also definitely the most significant factor in execution time, again since matrix multiplication is O(n^3)
 
 ![rubric_2.png](./rubric_2.png)
+
+### Dense Dense Matrix Multiplication
+
+
+![rubric_3.png](./rubric_3.png)
