@@ -42,4 +42,6 @@ We also see that the bandwidth at 100% read or 100% write is higher than a mix o
 ### 16k Block Size
 
 ![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
-![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
+![16K Block Size, Latency Plot](./plots/bandwidth_block_size_16k.png)
+
+As we increase the block size to 16k, we see that 
