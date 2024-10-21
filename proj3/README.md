@@ -60,6 +60,7 @@ Once again our data continues to follow the same trends we saw from the past two
 ### 128k Block Size
 
 ![128K Block Size, Latency Plot](./plots/latency_block_size_128k.png)
+![128K Block Size, IOPS Plot](./plots/IOPS_block_size_128k.png)
 ![128K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_128k.png)
 
 Finally, here we see that our latencies are at their highest and our throughputs are at their lowest once converted to IOPS. (~10000 peak IOPS)

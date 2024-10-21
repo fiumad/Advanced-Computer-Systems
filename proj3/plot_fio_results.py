@@ -18,7 +18,6 @@ def parse_fio_json(file_path):
     read_lat = job['read']['clat_ns']['mean'] / 1000  # Convert ns to µs
     write_lat = job['write']['clat_ns']['mean'] / 1000 if job['write']['iops'] > 0 else None
     #bw = job['read']['bw'] if job['read']['bw'] > 0 else job['write']['bw']  # in KiB/s
-    iops = 0
     if job['job options']['bs'] == '128k':
         if job['read']['bw'] > 0 and job['write']['bw'] > 0:
             bw = job['read']['bw'] + job['write']['bw']
@@ -29,12 +28,12 @@ def parse_fio_json(file_path):
             bw = job['write']['bw']
     else:
         bw = 0
-        if job['read']['iops'] > 0 and job['write']['iops'] > 0:
-            iops = (job['read']['iops'] + job['write']['iops']) / 2
-        elif job['read']['iops'] > 0:
-            iops = job['read']['iops']
-        elif job['write']['iops'] > 0:
-            iops = job['write']['iops']
+    if job['read']['iops'] > 0 and job['write']['iops'] > 0:
+        iops = (job['read']['iops'] + job['write']['iops']) / 2
+    elif job['read']['iops'] > 0:
+        iops = job['read']['iops']
+    elif job['write']['iops'] > 0:
+        iops = job['write']['iops']
 
     return read_lat, write_lat, iops, bw
 
