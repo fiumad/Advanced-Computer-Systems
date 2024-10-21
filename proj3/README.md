@@ -42,15 +42,19 @@ We also see that the bandwidth at 100% read or 100% write is higher than a mix o
 ### 16k Block Size
 
 ![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
-![16K Block Size, Latency Plot](./plots/bandwidth_block_size_16k.png)
+![16K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_16k.png)
 
 As we increase the block size to 16k, we see that our SSD performance follows the same trends as with 4k block size. One key difference however is that our latencies are much higher, now reaching as much as 4x the latencies of 4k block size. Our bandwidth actually increases for fully read or fully write scenarios as compared to 4k block size.
 
 ### 32k Block Size
 ![32K Block Size, Latency Plot](./plots/latency_block_size_32k.png)
-![32K Block Size, Latency Plot](./plots/bandwidth_block_size_32k.png)
+![32K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_32k.png)
 
+Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our bandwidths are starting to slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
 
+### 128k Block Size
 
+![128K Block Size, Latency Plot](./plots/latency_block_size_128k.png)
+![128K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_128k.png)
 
 
