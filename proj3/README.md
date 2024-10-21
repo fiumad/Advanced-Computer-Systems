@@ -33,29 +33,29 @@ As seen in `run_fio.sh`, the FIO tool is run according to the following (where `
 As seen above, all tests are run with the "randrw" mode meaning reads and writes are not sequential (i.e. worst case performance). Each job is run for 30 seconds, using the desired combination of R/W ratio, block size, and queue depth, and the results are output in json format.
 
 ## Results
-The results are two types of plots - the first being latency plots, the second being bandwidth plots. There are four variations of each type of plot, one for each block size. Each plot shows the effect of varying the queue depth on the performance of the SSD.
+The results are two types of plots - the first being latency plots, the second being throughput plots. There are four variations of each type of plot, one for each block size. Each plot shows the effect of varying the queue depth on the performance of the SSD.
 
 ### 4k Block Size
 ![4K Block Size, Latency Plot](./plots/latency_block_size_4k.png)
 
-![4K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_4k.png)
+![4K Block Size, IOPS Plot](./plots/IOPS_block_size_4k.png)
 
-We see in the plots above that as the queue depth increases, the latency drastically increases. This is expected as the SSD is being bombarded with more requests than it can handle. The bandwidth plot shows that as the SSD receives more requests, the bandwidth increases until it begins to plateau.
+We see in the plots above that as the queue depth increases, the latency drastically increases. This is expected as the SSD is being bombarded with more requests than it can handle. The throughput plot shows that as the SSD receives more requests, the throughput increases until it begins to plateau.
 
-We also see that the bandwidth at 100% read or 100% write is higher than a mix of both.
+We also see that the throughput at 100% read or 100% write is higher than a mix of both.
 
 ### 16k Block Size
 
 ![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
-![16K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_16k.png)
+![16K Block Size, IOPS Plot](./plots/IOPS_block_size_16k.png)
 
-As we increase the block size to 16k, we see that our SSD performance follows the same trends as with 4k block size. One key difference however is that our latencies are much higher, now reaching as much as 4x the latencies of 4k block size. Our bandwidth actually increases for fully read or fully write scenarios as compared to 4k block size.
+As we increase the block size to 16k, we see that our SSD performance follows the same trends as with 4k block size. One key difference however is that our latencies are much higher, now reaching as much as 4x the latencies of 4k block size. Our throughput actually increases for fully read or fully write scenarios as compared to 4k block size.
 
 ### 32k Block Size
 ![32K Block Size, Latency Plot](./plots/latency_block_size_32k.png)
-![32K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_32k.png)
+![32K Block Size, IOPS Plot](./plots/IOPS_block_size_32k.png)
 
-Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our peak bandwidths  slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
+Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our peak throughput slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
 
 ### 128k Block Size
 
