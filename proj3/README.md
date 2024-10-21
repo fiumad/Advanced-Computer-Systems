@@ -7,6 +7,11 @@
 4. The results are stored in `./fio_results/` in the json format
 5. These results are then parsed and plotted using `plot_fio_results.py`
 6. The resulting plots are saved in `./plots/`
+### Hardware
+The following tests were performed on the SAMSUNG MZVLB512HBJQ-000L7 NVME SSD.
+
+The example enterprise SSD in the assignment PDF achieved IOPS of 130k for a 100% write test with 4k block size.
+The SSD in my laptop achieves 225k IOPS for the same test. I believe this unexpected difference in performance is most likely due to redundancy and error correction technologies that are present in the enterprise grade device that aren't included in a consumer grade device such as mine. This would result in the enterprise grade device having lower performance but higher reliability.
 
 ### FIO Options
 As seen in `run_fio.sh`, the FIO tool is run according to the following (where `$name` is the name of the test, `$rw` is the read/write ratio, `$block_size` is the block size, `$queue_depth` is the queue depth, and `$result_file` is the output file):
@@ -50,11 +55,12 @@ As we increase the block size to 16k, we see that our SSD performance follows th
 ![32K Block Size, Latency Plot](./plots/latency_block_size_32k.png)
 ![32K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_32k.png)
 
-Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our bandwidths are starting to slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
+Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our peak bandwidths  slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
 
 ### 128k Block Size
 
 ![128K Block Size, Latency Plot](./plots/latency_block_size_128k.png)
 ![128K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_128k.png)
 
+Finally, here we see that our latencies are at their highest, and our bandwidth remains largely similar to previous block sizes. This is expected as the SSD is being bombarded with large requests that take longer to process, but once complete lots of data has been transferred to or from the device. Our peak bandwidth here is over 1200MB/s.
 
