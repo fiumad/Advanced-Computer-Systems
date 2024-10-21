@@ -7,3 +7,21 @@
 4. The results are stored in `./fio_results/` in the json format
 5. These results are then parsed and plotted using `plot_fio_results.py`
 6. The resulting plots are saved in `./plots/`
+
+### FIO Options
+As seen in `run_fio.sh`, the FIO tool is run according to the following (where `$name` is the name of the test, `$rw` is the read/write ratio, `$block_size` is the block size, `$queue_depth` is the queue depth, and `$result_file` is the output file):
+```bash
+  fio --name="$name" \
+    --rw=randrw \
+    --rwmixread="$rw" \
+    --bs="$block_size" \
+    --iodepth="$queue_depth" \
+    --size=2G \
+    --numjobs=1 \
+    --time_based --runtime=30 \
+    --ioengine=libaio --direct=1 \
+    --allow_mounted_write=1 \
+    --output-format=json \
+    --filename=/dev/nvme0n1p3 \
+    --output="$result_file"
+```
