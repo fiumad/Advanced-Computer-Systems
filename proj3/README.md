@@ -34,3 +34,12 @@ The results are two types of plots - the first being latency plots, the second b
 ![4K Block Size, Latency Plot](./plots/latency_block_size_4k.png)
 
 ![4K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_4k.png)
+
+We see in the plots above that as the queue depth increases, the latency drastically increases. This is expected as the SSD is being bombarded with more requests than it can handle. The bandwidth plot shows that as the SSD receives more requests, the bandwidth increases until it begins to plateau.
+
+We also see that the bandwidth at 100% read or 100% write is higher than a mix of both.
+
+### 16k Block Size
+
+![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
+![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
