@@ -25,3 +25,12 @@ As seen in `run_fio.sh`, the FIO tool is run according to the following (where `
     --filename=/dev/nvme0n1p3 \
     --output="$result_file"
 ```
+As seen above, all tests are run with the "randrw" mode meaning reads and writes are not sequential (i.e. worst case performance). Each job is run for 30 seconds, using the desired combination of R/W ratio, block size, and queue depth, and the results are output in json format.
+
+## Results
+The results are two types of plots - the first being latency plots, the second being bandwidth plots. There are four variations of each type of plot, one for each block size. Each plot shows the effect of varying the queue depth on the performance of the SSD.
+
+### 4k Block Size
+![4K Block Size, Latency Plot](./plots/latency_block_size_4k.png)
+
+![4K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_4k.png)
