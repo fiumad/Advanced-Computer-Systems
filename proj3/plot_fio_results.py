@@ -1,9 +1,15 @@
+
 import json
 import os
 import matplotlib.pyplot as plt
 
 # Directory where FIO JSON output files are stored
 output_dir = 'fio_results'
+
+# Parameters used in the tests
+block_sizes = ["4k", "16k", "32k", "128k"]
+rwmix_ratios = [100, 70, 50, 0]  # New rwmix ratios
+queue_depths = [1, 8, 64, 1024]
 
 # Function to parse FIO JSON file and extract relevant data
 def parse_fio_json(file_path):
@@ -13,84 +19,85 @@ def parse_fio_json(file_path):
     read_lat = job['read']['clat_ns']['mean'] / 1000  # Convert ns to µs
     write_lat = job['write']['clat_ns']['mean'] / 1000 if job['write']['iops'] > 0 else None
     iops = job['read']['iops'] if job['read']['iops'] > 0 else job['write']['iops']
-    bw = job['read']['bw'] if job['read']['bw'] > 0 else job['write']['bw']  # in KiB/s
+    #bw = job['read']['bw'] if job['read']['bw'] > 0 else job['write']['bw']  # in KiB/s
+    if job['read']['bw'] > 0 and job['write']['bw'] > 0:
+        bw = job['read']['bw'] + job['write']['bw']
+        bw /= 2
+    elif job['read']['bw'] > 0:
+        bw = job['read']['bw']
+    elif job['write']['bw'] > 0:
+        bw = job['write']['bw']
     return read_lat, write_lat, iops, bw
 
-# Lists to hold results for each test category
-block_sizes = []
-block_latency = []
-block_bandwidth = []
+# Organize results by block size, rwmix ratio, and queue depth
+results = {
+    block_size: {
+        rwmix: {
+            qd: {'latency': None, 'bandwidth': None} for qd in queue_depths
+        } for rwmix in rwmix_ratios
+    } for block_size in block_sizes
+}
 
-rw_ratios = []
-rw_latency = []
-rw_bandwidth = []
-
-queue_depths = []
-queue_latency = []
-queue_bandwidth = []
-
-# Process all JSON files and categorize based on filename
+# Process all JSON files and categorize data by block size, rwmix ratio, and queue depth
 for file_name in os.listdir(output_dir):
     if file_name.endswith('.json'):
         file_path = os.path.join(output_dir, file_name)
         read_lat, write_lat, iops, bw = parse_fio_json(file_path)
         
-        # Extract parameters from file name to categorize data
-        if 'data-access-size' in file_name:
-            block_size = file_name.split('_bs')[1].split('_')[0]
-            block_sizes.append(block_size)
-            block_latency.append(read_lat)
-            block_bandwidth.append(iops)
-        
-        elif 'rw-ratio' in file_name:
-            rw_ratio = file_name.split('_rw')[1].split('_')[0]
-            rw_ratios.append(rw_ratio)
-            rw_latency.append(read_lat)
-            rw_bandwidth.append(iops)
-        
-        elif 'queue-depth' in file_name:
-            queue_depth = file_name.split('_qd')[1].split('_')[0]
-            queue_depths.append(queue_depth)
-            queue_latency.append(read_lat)
-            queue_bandwidth.append(iops)
+        # Extract parameters from file name
+        block_size = file_name.split('_bs')[1].split('_')[0]
+        rwmix = int(file_name.split('_rw')[1].split('_')[0])  # Now it's the rwmix ratio
+        queue_depth = int(file_name.split('_qd')[1].split('_')[0].replace('.json', ''))
 
-# Convert KiB/s to MB/s for bandwidth plots
-block_bandwidth = [bw / 1024 for bw in block_bandwidth]
-rw_bandwidth = [bw / 1024 for bw in rw_bandwidth]
-queue_bandwidth = [bw / 1024 for bw in queue_bandwidth]
+        # Debugging: Print extracted values to check for errors
+        print(f"Processing file: {file_name}")
+        print(f"Block Size: {block_size}, R/W Mix: {rwmix}, Queue Depth: {queue_depth}")
 
-# Function to generate and save plots
-def plot_data(x, y, xlabel, ylabel, title, file_name):
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, y, marker='o')
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title)
+        # Store latency and bandwidth data
+        if write_lat is None:
+            results[block_size][rwmix][queue_depth]['latency'] = read_lat
+        elif read_lat is None:
+            results[block_size][rwmix][queue_depth]['latency'] = write_lat
+        else:
+            results[block_size][rwmix][queue_depth]['latency'] = (write_lat + read_lat) / 2  # Average of read and write lat
+        results[block_size][rwmix][queue_depth]['bandwidth'] = bw / 1024  # Convert KiB/s to MB/s
+
+# Function to generate and save latency plots
+def plot_latency(block_size):
+    plt.figure(figsize=(10, 6))
+    
+    # Plot latency for each rwmix ratio across different queue depths
+    for rwmix in rwmix_ratios:
+        latencies = [results[block_size][rwmix][qd]['latency'] for qd in queue_depths]
+        plt.plot(queue_depths, latencies, marker='o', label=f'R/W Mix {rwmix}')
+
+    plt.xlabel('Queue Depth')
+    plt.ylabel('Latency (µs)')
+    plt.title(f'Latency for Block Size {block_size}')
+    plt.legend(title='R/W Mix Ratio')
     plt.grid(True)
-    plt.savefig(f"{file_name}.png")
+    plt.savefig(f"./plots/latency_block_size_{block_size}.png")
     plt.show()
 
-# Plot 1: Effect of Data Access Size on Latency
-plot_data(block_sizes, block_latency, 'Block Size', 'Latency (µs)',
-          'Effect of Data Access Size on Latency', 'block_size_vs_latency')
+# Function to generate and save bandwidth plots
+def plot_bandwidth(block_size):
+    plt.figure(figsize=(10, 6))
+    
+    # Plot bandwidth for each rwmix ratio across different queue depths
+    for rwmix in rwmix_ratios:
+        bandwidths = [results[block_size][rwmix][qd]['bandwidth'] for qd in queue_depths]
+        plt.plot(queue_depths, bandwidths, marker='o', label=f'R/W Mix {rwmix}')
 
-# Plot 2: Effect of Data Access Size on Bandwidth
-plot_data(block_sizes, block_bandwidth, 'Block Size', 'Bandwidth (MB/s)',
-          'Effect of Data Access Size on Bandwidth', 'block_size_vs_bandwidth')
+    plt.xlabel('Queue Depth')
+    plt.ylabel('Bandwidth (MB/s)')
+    plt.title(f'Bandwidth for Block Size {block_size}')
+    plt.legend(title='R/W Mix Ratio')
+    plt.grid(True)
+    plt.savefig(f"./plots/bandwidth_block_size_{block_size}.png")
+    plt.show()
 
-# Plot 3: Effect of Read/Write Ratio on Latency
-plot_data(rw_ratios, rw_latency, 'Read/Write Ratio', 'Latency (µs)',
-          'Effect of Read/Write Ratio on Latency', 'rw_ratio_vs_latency')
-
-# Plot 4: Effect of Read/Write Ratio on Bandwidth
-plot_data(rw_ratios, rw_bandwidth, 'Read/Write Ratio', 'Bandwidth (MB/s)',
-          'Effect of Read/Write Ratio on Bandwidth', 'rw_ratio_vs_bandwidth')
-
-# Plot 5: Effect of Queue Depth on Latency
-plot_data(queue_depths, queue_latency, 'Queue Depth', 'Latency (µs)',
-          'Effect of Queue Depth on Latency', 'queue_depth_vs_latency')
-
-# Plot 6: Effect of Queue Depth on Bandwidth
-plot_data(queue_depths, queue_bandwidth, 'Queue Depth', 'Bandwidth (MB/s)',
-          'Effect of Queue Depth on Bandwidth', 'queue_depth_vs_bandwidth')
+# Generate plots for each block size
+for bs in block_sizes:
+    plot_latency(bs)
+    plot_bandwidth(bs)
 
