@@ -40,9 +40,9 @@ The results are two types of plots - the first being latency plots, the second b
 
 ![4K Block Size, IOPS Plot](./plots/IOPS_block_size_4k.png)
 
-We see in the plots above that as the queue depth increases, the latency drastically increases. This is expected as the SSD is being bombarded with more requests than it can handle. The throughput plot shows that as the SSD receives more requests, the throughput increases until it begins to plateau.
+We see in the plots above that as the queue depth increases, the latency drastically increases. This is expected as the SSD is being bombarded with more requests than it can handle. When more requests are added to the queue, each request has to wait longer. The throughput plot shows that as the SSD receives more requests, the throughput increases until it begins to plateau. This is expected since the SSD will always be fed the next request when the queue is full (not waiting around for a new request), but once it reaches its maximum speed, the queue getting longer will not increase the throughput.
 
-We also see that the throughput at 100% read or 100% write is higher than a mix of both.
+We also see that the throughput at 100% read or 100% write is higher than a mix of both. There are several reasons for this. First, pure read or pure write workloads can allow the SSD's hardware to be fully allocated to a single task. We also notice that pure read workloads are faster than pure write workloads. One reason for this could be that modern SSD's have extra processing to do on write operations to manage wear leveling and extend the life of the device. This introduces extra overhead that diminishes write speeds.
 
 ### 16k Block Size
 
