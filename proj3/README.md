@@ -49,18 +49,18 @@ We also see that the throughput at 100% read or 100% write is higher than a mix 
 ![16K Block Size, Latency Plot](./plots/latency_block_size_16k.png)
 ![16K Block Size, IOPS Plot](./plots/IOPS_block_size_16k.png)
 
-As we increase the block size to 16k, we see that our SSD performance follows the same trends as with 4k block size. One key difference however is that our latencies are much higher, now reaching as much as 4x the latencies of 4k block size. Our throughput actually increases for fully read or fully write scenarios as compared to 4k block size.
+As we increase the block size to 16k, we see that our SSD performance follows the same trends as with 4k block size. One key difference however is that our latencies are much higher, now reaching as much as 4x the latencies of 4k block size. Our throughput also sees a marked decrease by more than half of the throughput we saw at a 4k block size.
 
 ### 32k Block Size
 ![32K Block Size, Latency Plot](./plots/latency_block_size_32k.png)
 ![32K Block Size, IOPS Plot](./plots/IOPS_block_size_32k.png)
 
-Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our peak throughput slightly decrease (~850MB/s peak as compared to ~1100MB/s peak for 16k block size).
+Once again our data continues to follow the same trends we saw from the past two block sizes examined. Our latencies once again increased greatly, and our throughputs roughly halved.
 
 ### 128k Block Size
 
 ![128K Block Size, Latency Plot](./plots/latency_block_size_128k.png)
 ![128K Block Size, Bandwidth Plot](./plots/bandwidth_block_size_128k.png)
 
-Finally, here we see that our latencies are at their highest, and our bandwidth remains largely similar to previous block sizes. This is expected as the SSD is being bombarded with large requests that take longer to process, but once complete lots of data has been transferred to or from the device. Our peak bandwidth here is over 1200MB/s.
+Finally, here we see that our latencies are at their highest and our throughputs are at their lowest once converted to IOPS. (~1000 peak IOPS)
 

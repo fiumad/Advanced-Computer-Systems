@@ -130,7 +130,7 @@ for bs in block_sizes:
 """
 for bs in block_sizes:
     if bs == "128k":
-        pass
-    else:
         plot_iops(bs)
+    else:
+        pass
 
