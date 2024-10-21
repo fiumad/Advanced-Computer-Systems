@@ -33,7 +33,7 @@ As seen in `run_fio.sh`, the FIO tool is run according to the following (where `
 As seen above, all tests are run with the "randrw" mode meaning reads and writes are not sequential (i.e. worst case performance). Each job is run for 30 seconds, using the desired combination of R/W ratio, block size, and queue depth, and the results are output in json format.
 
 ## Results
-The results are two types of plots - the first being latency plots, the second being throughput plots. There are four variations of each type of plot, one for each block size. Each plot shows the effect of varying the queue depth on the performance of the SSD. As per the rubric and assignment handout, the throughput plots are in IOPS up until 64k block size, then they switch to bandwidth plots in MB/s (even though that makes it harder to compare between block sizes).
+The results are two types of plots - the first being latency plots, the second being throughput plots. There are four variations of each type of plot, one for each block size. Each plot shows the effect of varying the queue depth on the performance of the SSD. As per the rubric and assignment handout, the throughput plots are in IOPS up until 64k block size, then they switch to bandwidth plots in MB/s (IOPS plot is included in 128k block size section for easier comparisons to previous tests).
 
 ### 4k Block Size
 ![4K Block Size, Latency Plot](./plots/latency_block_size_4k.png)
