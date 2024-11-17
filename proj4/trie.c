@@ -7,7 +7,7 @@
 
 
 int main() {
-    const char *filename = "test_column.txt";
+    const char *filename = "encoded_data_full.txt";
 
     // Load data into Trie
     TrieNode *trie_root = load_trie_from_file(filename);
@@ -27,7 +27,7 @@ int main() {
 
     // Use the Trie for queries or further processing...
 
-    search_by_prefix(trie_root, "b", &results, &result_indices, num_indices, &result_count);
+    search_by_prefix(trie_root, "dan", &results, &result_indices, num_indices, &result_count);
 
     // Print results
     printf("Words matching prefix:\n");
@@ -42,7 +42,11 @@ int main() {
         free(result_indices[i]);
     }
 
-    printf("key arneq has %d occurrances\n", search_trie(trie_root, "arneq", &result_count));
+    int *search_results;
+    const char *word = "dano";
+    search_results = search_trie(trie_root, word, &result_count);
+
+    printf("key %s has %d occurrances\n", word, result_count);
 
     free(results);
     free(result_indices);

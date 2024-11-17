@@ -50,7 +50,7 @@ void collect_words(TrieNode *node, char *prefix, char ***results, int ***result_
         (*result_indices)[*result_count] = malloc(node->index_count * sizeof(int));
         memcpy((*result_indices)[*result_count], node->indices, node->index_count * sizeof(int));
         num_indices[*result_count] = node->index_count;
-        printf("index count is %d\n", num_indices[*result_count]);
+        //printf("index count is %d\n", num_indices[*result_count]);
         (*result_count)++;
     }
 
@@ -95,9 +95,9 @@ int *search_trie(TrieNode *root, const char *word, int *index_count) {
     TrieNode *current = root;
 
     for (int i = 0; word[i] != '\0'; i++) {
-        printf("searching for %c\n", word[i]);
+        //printf("searching for %c\n", word[i]);
         int char_index = word[i] - 'a'; // Assumes lowercase a-z
-        if (char_index < 0 || char_index >= 26) {
+        if (char_index < 0 || char_index >= ALPHABET_SIZE) {
             fprintf(stderr, "Invalid character in word: '%c'\n", word[i]);
             return NULL; // Invalid character for the Trie
         }
@@ -111,15 +111,14 @@ int *search_trie(TrieNode *root, const char *word, int *index_count) {
 
     // Check if the final node is the end of a word
     if (current && current->is_end_of_word) {
-        *index_count = current->index_count; //PROBLEM: index_count is not being updated
-        printf("found word %s\n", word);
-        printf("word has %d indices\n", current->index_count);
-        return current->indices; // Return the indices associated with the word
+        *index_count = current->index_count; // Update the index count
+        //printf("found word %s\n", word);
+        //printf("word has %d indices\n", current->index_count);
+        return current->indices; // Return the pointer to the list of indices
     }
 
     return NULL; // Word not found
 }
-
 // Function to create a new Trie node
 TrieNode *create_trie_node() {
     TrieNode *node = malloc(sizeof(TrieNode));
@@ -136,7 +135,7 @@ TrieNode *create_trie_node() {
     return node;
 }
 
-void trie_insert(TrieNode *root, const char *key, int index, int counter) {
+void trie_insert(TrieNode *root, const char *key, int *new_indices, int new_count) {
     TrieNode *node = root;
     for (int i = 0; key[i] != '\0'; i++) {
         int char_index = key[i] - 'a'; // Convert char to index
@@ -151,10 +150,15 @@ void trie_insert(TrieNode *root, const char *key, int index, int counter) {
     }
     node->is_end_of_word = 1;
 
-    // Append the index to the list of indices
-    node->indices = realloc(node->indices, (node->index_count + 1) * sizeof(int));
-    node->indices[node->index_count++] = index;
-    node->index_count = counter;
+    // Append new indices to the existing indices array
+    node->indices = realloc(node->indices, (node->index_count + new_count) * sizeof(int));
+    if (!node->indices) {
+        perror("Memory allocation failed in trie_insert");
+        exit(EXIT_FAILURE);
+    }
+
+    memcpy(&node->indices[node->index_count], new_indices, new_count * sizeof(int));
+    node->index_count += new_count;
 }
 
 TrieNode *load_trie_from_file(const char *filename) {
@@ -190,16 +194,13 @@ TrieNode *load_trie_from_file(const char *filename) {
         }
 
         int counter = atoi(counter_str);
-        printf("counter is %d\n", counter);
+        //printf("Counter is %d\n", counter);
         if (counter <= 0) {
             fprintf(stderr, "Invalid counter value %d at line %d\n", counter, line_number);
             continue;
         }
 
         int *indices = malloc(counter * sizeof(int));
-        for (int i = 0; i < counter; i++) {
-            printf("index %d is %d\n", i, indices[i]);
-        }
         if (!indices) {
             perror("Memory allocation failed");
             fclose(file);
@@ -217,12 +218,10 @@ TrieNode *load_trie_from_file(const char *filename) {
                 return NULL;
             }
             indices[i] = atoi(index_str);
+            //printf("Index %d is %d\n", i, indices[i]);
         }
 
-        // Insert reconstructed data into the Trie
-        for (int i = 0; i < counter; i++) {
-            trie_insert(trie_root, key, indices[i], counter);
-        }
+        trie_insert(trie_root, key, indices, counter);
 
         free(indices);
     }
