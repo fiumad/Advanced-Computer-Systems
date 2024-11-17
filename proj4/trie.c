@@ -7,7 +7,7 @@
 
 
 int main() {
-    const char *filename = "encoded_data_full.txt";
+    const char *filename = "test_column.txt";
 
     // Load data into Trie
     TrieNode *trie_root = load_trie_from_file(filename);
@@ -21,19 +21,20 @@ int main() {
     // Perform prefix search
     char **results = malloc(INITIAL_CAPACITY * sizeof(char *));
     int **result_indices = malloc(INITIAL_CAPACITY * sizeof(int *));
+    int *num_indices = malloc(INITIAL_CAPACITY * sizeof(int));
     int result_count = 0;
     int capacity = INITIAL_CAPACITY;
 
     // Use the Trie for queries or further processing...
-    search_by_prefix(trie_root, "dan", &results, &result_indices, &result_count);
+
+    search_by_prefix(trie_root, "b", &results, &result_indices, num_indices, &result_count);
 
     // Print results
     printf("Words matching prefix:\n");
     for (int i = 0; i < result_count; i++) {
         printf("%s: ", results[i]);
-        int num_indices = sizeof(**result_indices) / sizeof(result_indices[0][0]);
-        printf("%s has %d indices\n", results[i], num_indices);
-        for (int j = 0; j < num_indices; j++) {
+        printf("%s has %d indices\n", results[i], num_indices[i]);
+        for (int j = 0; j < num_indices[i]; j++) {
             printf("%d ", result_indices[i][j]);
         }
         printf("\n");
@@ -41,8 +42,11 @@ int main() {
         free(result_indices[i]);
     }
 
+    printf("key arneq has %d occurrances\n", search_trie(trie_root, "arneq", &result_count));
+
     free(results);
     free(result_indices);
+    free(num_indices);
 
 
     // Free the Trie when done
