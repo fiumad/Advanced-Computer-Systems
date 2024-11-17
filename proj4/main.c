@@ -40,11 +40,10 @@ void *process_lines(void *arg) {
 
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        fprintf(stderr, "Usage: %s <file_path> <num_threads>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <file_path> <num_threads> <read/save>\n", argv[0]);
         return EXIT_FAILURE;
     }
-
-    if (argv[3] == "save") {
+    if (strcmp(argv[3], "save") == 0) {
       printf("Saving hash table to file\n");
 
       char *file_path = argv[1];
@@ -69,6 +68,7 @@ int main(int argc, char *argv[]) {
           return EXIT_FAILURE;
       }
 
+      //read the file into the lines array
       int total_lines = 0;
       char buffer[MAX_LINE_LENGTH];
       while (fgets(buffer, MAX_LINE_LENGTH, file)) {
@@ -115,44 +115,54 @@ int main(int argc, char *argv[]) {
       // Print message after all threads are done
       printf("All lines have been hashed into the hash table.\n");
 
-      // Save the hash table to a file
-      save_hash_table_to_file(hash_table, "encoded_data.txt");
-
       pthread_mutex_destroy(&lock);
-    }
-    else if (argv[3] == "read"){
-      *HashTable hash_table;
-      hash_table = load_hash_table_from_file("encoded_data.txt");
-    }
 
-    char search_term[128];
-
-    while (search_term[0] != '!') {
-      printf("Enter a search term, enter \'!\' to end the program: ");
-      scanf("%128s", search_term);
-      const char *search_query = search_term;
-      printf("Searching for key: %s\n", search_query);
-      Node *query;
-      query = search(hash_table, search_query);
-
-      if (!query) {
-        printf("Key not found in hash table.\n");
+      // Save the hash table to a file
+      if (hash_table == NULL) {
+          fprintf(stderr, "Error creating hash table\n");
+          return EXIT_FAILURE;
       }
-      else {
-        printf("Key: %s, Counter: %d, Indexes: ", query->key, query->counter);
-        for (int i = 0; i < query->index_list.size; i++) {
-          printf("%d ", query->index_list.indices[i]);
-        }
-        printf("\n");
-      }
-    }
+      save_hash_table_to_file(hash_table, "encoded_data_sm.txt");
 
-    // Free memory
-    for (int i = 0; i < total_lines; i++) {
+      // Free memory
+      for (int i = 0; i < total_lines; i++) {
         free(lines[i]);
+      }
+      free(lines);
+      free_hash_table(hash_table);
     }
-    free(lines);
-    free_hash_table(hash_table);
+    else if (strcmp(argv[3], "read") == 0) {
+      HashTable *hash_table;
+      hash_table = load_hash_table_from_file("encoded_data_full.txt");
+      if (!hash_table) {
+        fprintf(stderr, "Error loading hash table from file\n");
+        return EXIT_FAILURE;
+      }
+
+      char search_term[128];
+
+      while (search_term[0] != '!') {
+        printf("Enter a search term, enter \'!\' to end the program: ");
+        scanf("%127s", search_term);
+        const char *search_query = search_term;
+        printf("Searching for key: %s\n", search_query);
+        Node *query;
+        query = search(hash_table, search_query);
+
+        if (!query) {
+          printf("Key not found in hash table.\n");
+        }
+        else {
+          printf("Key: %s, Counter: %d, Indexes: ", query->key, query->counter);
+          for (int i = 0; i < query->index_list.size; i++) {
+            printf("%d ", query->index_list.indices[i]);
+          }
+          printf("\n");
+        }
+      }
+        free_hash_table(hash_table);
+    }
+
 
     return EXIT_SUCCESS;
 }

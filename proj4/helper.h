@@ -138,13 +138,14 @@ void insert_with_index(HashTable *hash_table, const char *key, int index) {
     unsigned int hash_value = hash_function(key);
     int bucket_index = hash_value % NUM_BUCKETS;
 
-    Node *current = hash_table->buckets[bucket_index];
+    Bucket *bucket = hash_table->buckets[bucket_index];
+    Node *current = bucket->head;
+
     while (current) {
         if (strcmp(current->key, key) == 0) {
             // Key already exists; update the node
             current->counter++;
-            current->index_list->indices = realloc(current->index_list->indices, current->counter * sizeof(int));
-            current->index_list->indices[current->counter - 1] = index; // Add the new index
+            add_index(&current->index_list, index);
             return;
         }
         current = current->next;
@@ -154,10 +155,13 @@ void insert_with_index(HashTable *hash_table, const char *key, int index) {
     Node *new_node = malloc(sizeof(Node));
     new_node->key = strdup(key);
     new_node->counter = 1;
-    new_node->index_list->indices = malloc(sizeof(int));
-    new_node->index_list->indices[0] = index; // Store the first index
-    new_node->next = hash_table->buckets[bucket_index];
-    hash_table->buckets[bucket_index] = new_node;
+    new_node->index_list.indices = malloc(sizeof(int));
+    new_node->index_list.indices[0] = index; // Store the first index
+    new_node->next = hash_table->buckets[bucket_index]->head;
+
+    Bucket *new_bucket = malloc(sizeof(Bucket));
+    new_bucket->head = new_node;
+    hash_table->buckets[bucket_index] = new_bucket;
 }
 
 // Search for a key in the hash table and return its node
@@ -206,18 +210,29 @@ void save_hash_table_to_file(HashTable *hash_table, const char *filename) {
         perror("Error opening file for writing");
         return;
     }
+    if (!hash_table) {
+      fprintf(stderr, "Error saving hash table to file\n");
+      return;
+    }
 
+    printf("Saving hash table to file...\n");
     for (int i = 0; i < NUM_BUCKETS; i++) {
-        Node *current = hash_table->buckets[i];
+        Bucket *bucket = hash_table->buckets[i];
+        if (!bucket) {
+          continue;
+        }
+        else {
+        Node *current = bucket->head;
         while (current) {
             // Write the key, counter, and all indices to the file
-            fprintf(file, "%s %d", current->key, current->counter);
-            for (int j = 0; j < current->counter; j++) {
-                fprintf(file, " %d", current->index_list->indices[j]);
+            fprintf(file, "%s %d", current->key, current->index_list.size);
+            for (int j = 0; j < current->index_list.size; j++) {
+                fprintf(file, " %d", current->index_list.indices[j]);
             }
             fprintf(file, "\n");
             current = current->next;
         }
+      }
     }
 
     fclose(file);
@@ -230,19 +245,58 @@ HashTable *load_hash_table_from_file(const char *filename) {
         return NULL;
     }
 
+    printf("Loading hash table from file...\n");
+
     HashTable *hash_table = create_hash_table();
-    char buffer[1024];
+    char buffer[999999];
+    int line_number = 0;
     while (fgets(buffer, sizeof(buffer), file)) {
+        if (buffer[strlen(buffer) - 1] == '\n') {
+            buffer[strlen(buffer) - 1] = '\0'; // Remove newline
+        }
+
+        line_number++;
+
         char *key = strtok(buffer, " ");
-        int counter = atoi(strtok(NULL, " "));
+        if (!key) {
+            fprintf(stderr, "Skipping malformed line due to key error\n");
+            continue;
+        }
+
+        char *counter_str = strtok(NULL, " ");
+        if (!counter_str) {
+            fprintf(stderr, "Skipping malformed line due to counter error\n");
+            continue;
+        }
+        int counter = atoi(counter_str);
+        if (counter <= 0) {
+            fprintf(stderr, "Invalid counter value: %d\n", counter);
+            continue;
+        }
+
         int *indices = malloc(counter * sizeof(int));
+        if (!indices) {
+            perror("Memory allocation failed");
+            fclose(file);
+            free_hash_table(hash_table);
+            return NULL;
+        }
+
         for (int i = 0; i < counter; i++) {
-            indices[i] = atoi(strtok(NULL, " "));
+            char *index_str = strtok(NULL, " ");
+            if (!index_str) {
+                fprintf(stderr, "Skipping malformed line due to missing index string\n");
+                free(indices);
+                fclose(file);
+                free_hash_table(hash_table);
+                return NULL;
+            }
+            indices[i] = atoi(index_str);
         }
 
         // Insert reconstructed data into the hash table
         for (int i = 0; i < counter; i++) {
-            insert_with_index(hash_table, key, indices[i]);
+            insert(hash_table, key, indices[i]);
         }
 
         free(indices);
