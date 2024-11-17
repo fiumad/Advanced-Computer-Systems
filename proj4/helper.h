@@ -134,6 +134,32 @@ void insert(HashTable *hash_table, const char *key, int index) {
     bucket->head = new_node;
 }
 
+void insert_with_index(HashTable *hash_table, const char *key, int index) {
+    unsigned int hash_value = hash_function(key);
+    int bucket_index = hash_value % NUM_BUCKETS;
+
+    Node *current = hash_table->buckets[bucket_index];
+    while (current) {
+        if (strcmp(current->key, key) == 0) {
+            // Key already exists; update the node
+            current->counter++;
+            current->index_list->indices = realloc(current->index_list->indices, current->counter * sizeof(int));
+            current->index_list->indices[current->counter - 1] = index; // Add the new index
+            return;
+        }
+        current = current->next;
+    }
+
+    // Key doesn't exist; create a new node
+    Node *new_node = malloc(sizeof(Node));
+    new_node->key = strdup(key);
+    new_node->counter = 1;
+    new_node->index_list->indices = malloc(sizeof(int));
+    new_node->index_list->indices[0] = index; // Store the first index
+    new_node->next = hash_table->buckets[bucket_index];
+    hash_table->buckets[bucket_index] = new_node;
+}
+
 // Search for a key in the hash table and return its node
 Node *search(HashTable *hash_table, const char *key) {
     unsigned int hash_index = hash_function(key);
@@ -174,3 +200,54 @@ void free_hash_table(HashTable *hash_table) {
     free(hash_table);
 }
 
+void save_hash_table_to_file(HashTable *hash_table, const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        perror("Error opening file for writing");
+        return;
+    }
+
+    for (int i = 0; i < NUM_BUCKETS; i++) {
+        Node *current = hash_table->buckets[i];
+        while (current) {
+            // Write the key, counter, and all indices to the file
+            fprintf(file, "%s %d", current->key, current->counter);
+            for (int j = 0; j < current->counter; j++) {
+                fprintf(file, " %d", current->index_list->indices[j]);
+            }
+            fprintf(file, "\n");
+            current = current->next;
+        }
+    }
+
+    fclose(file);
+}
+
+HashTable *load_hash_table_from_file(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Error opening file for reading");
+        return NULL;
+    }
+
+    HashTable *hash_table = create_hash_table();
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), file)) {
+        char *key = strtok(buffer, " ");
+        int counter = atoi(strtok(NULL, " "));
+        int *indices = malloc(counter * sizeof(int));
+        for (int i = 0; i < counter; i++) {
+            indices[i] = atoi(strtok(NULL, " "));
+        }
+
+        // Insert reconstructed data into the hash table
+        for (int i = 0; i < counter; i++) {
+            insert_with_index(hash_table, key, indices[i]);
+        }
+
+        free(indices);
+    }
+
+    fclose(file);
+    return hash_table;
+}
