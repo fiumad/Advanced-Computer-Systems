@@ -25,11 +25,10 @@ void free_trie(TrieNode *root) {
 }
 
 // Function to grow a dynamic array
-void grow_arrays(char ***results, int ***result_indices, int **num_indices_per_result, int *capacity) {
+void grow_arrays(char ***results, int ***result_indices, int *capacity) {
     *capacity *= 2;
     *results = realloc(*results, (*capacity) * sizeof(char *));
     *result_indices = realloc(*result_indices, (*capacity) * sizeof(int *));
-    //*num_indices_per_result = realloc(*num_indices_per_result, (*capacity) * sizeof(int *));
     if (!*results || !*result_indices) {
         perror("Failed to resize arrays");
         exit(EXIT_FAILURE);
@@ -70,7 +69,7 @@ void collect_words(TrieNode *node, char *prefix, char ***results, int ***result_
     }
 }
 
-void search_by_prefix(TrieNode *root, const char *prefix, char ***results, int ***result_indices, int **num_indices ,int *result_count) {
+void search_by_prefix(TrieNode *root, const char *prefix, char ***results, int ***result_indices, int *result_count) {
   TrieNode *node = root;
   for (int i = 0; prefix[i]; i++) {
       int index = prefix[i] - 'a'; // Assumes lowercase alphabet
