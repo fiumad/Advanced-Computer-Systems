@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <time.h>
 #include "helper.h"
 #include "trie.h"
 
@@ -77,9 +78,14 @@ int main(int argc, char *argv[]) {
 
     // Use the Trie for queries or further processing...
 
+    clock_t start = clock();
     search_by_prefix(trie_root, "dan", &results, &result_indices, num_indices, &result_count);
+    clock_t end = clock();
+    double time_taken = ((double)end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to search by prefix: %f seconds\n", time_taken);
 
     // Print results
+    /*
     printf("Words matching prefix:\n");
     for (int i = 0; i < result_count; i++) {
         printf("%s: ", results[i]);
@@ -90,11 +96,17 @@ int main(int argc, char *argv[]) {
         printf("\n");
         free(results[i]);
         free(result_indices[i]);
-    }
+    } */
 
     int *search_results;
     const char *word = "dano";
+
+    clock_t start2 = clock();
     search_results = search_trie(trie_root, word, &result_count);
+    clock_t end2 = clock();
+    double time_taken2 = ((double)end2 - start2) / CLOCKS_PER_SEC;
+    printf("Time taken to search for word: %f seconds\n", time_taken2);
+
 
     printf("key %s has %d occurrances\n", word, result_count);
 

@@ -34,6 +34,7 @@ void free_trie(TrieNode *root) {
     }
 
     free(root->indices);
+    pthread_mutex_destroy(&root->lock);
     free(root);
 }
 
@@ -145,6 +146,14 @@ TrieNode *create_trie_node() {
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         node->children[i] = NULL;
     }
+
+    // Initialize the mutex
+    if (pthread_mutex_init(&node->lock, NULL) != 0) {
+        perror("Failed to initialize mutex");
+        free(node);
+        exit(EXIT_FAILURE);
+    }
+
     return node;
 }
 
@@ -176,31 +185,49 @@ void trie_insert(TrieNode *root, const char *key, int *new_indices, int new_coun
 
 // Thread-safe insertion into the trie
 void threaded_trie_insert(TrieNode *root, const char *key, int *new_indices, int new_count) {
-    pthread_mutex_lock(&trie_mutex);  // Lock the mutex to ensure thread safety
     TrieNode *node = root;
+
+    // Lock the root node before starting
+    pthread_mutex_lock(&node->lock);
+
     for (int i = 0; key[i] != '\0'; i++) {
         int char_index = key[i] - 'a'; // Convert char to index
+
         if (char_index < 0 || char_index >= ALPHABET_SIZE) {
             fprintf(stderr, "Unsupported character: %c\n", key[i]);
+            pthread_mutex_unlock(&node->lock);
             return; // Ignore invalid characters
         }
+
+        // Lock the current node's mutex
         if (!node->children[char_index]) {
+            // Allocate a new child node under the lock
             node->children[char_index] = create_trie_node();
         }
-        node = node->children[char_index];
+
+        // Move to the child node, lock it, and unlock the parent
+        TrieNode *next_node = node->children[char_index];
+        pthread_mutex_lock(&next_node->lock);
+        pthread_mutex_unlock(&node->lock);
+        node = next_node;
     }
+
+    // Update the node at the end of the key
     node->is_end_of_word = 1;
 
     // Append new indices to the existing indices array
     node->indices = realloc(node->indices, (node->index_count + new_count) * sizeof(int));
     if (!node->indices) {
         perror("Memory allocation failed in trie_insert");
+        pthread_mutex_unlock(&node->lock);
         exit(EXIT_FAILURE);
     }
 
     memcpy(&node->indices[node->index_count], new_indices, new_count * sizeof(int));
     node->index_count += new_count;
-    pthread_mutex_unlock(&trie_mutex);  // Unlock the mutex
+
+    // Unlock the last node
+    pthread_mutex_unlock(&node->lock);
 }
 
 // Function to ingest raw column data from a portion of the file into the trie
