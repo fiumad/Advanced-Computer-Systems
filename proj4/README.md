@@ -19,7 +19,7 @@ by searching for the entire key, or by searching for a prefix.
 
 ## Data Structure
 
-![Trie]("./trie.png")
+![Trie]("trie.png")
 *In the image above, the prefix "dan" is found during search (red nodes) and each key with the same prefix is found by traversing
 through all of the prefix's children nodes*
 
@@ -36,7 +36,7 @@ risk of resource contention. Unfortunately, multithreading the encoding process 
 the threads were constantly waiting on each other to access the trie. However, the trie is incredibly fast at searching for
 both words and prefixes.
 
-![Encoding Time]("./trie_execution_time_plot.png")
+![Encoding Time]("trie_execution_time_plot.png")
 
 As seen in the graph above, the trie encoding time does not see a speedup as more threads are used. In fact it seems that the overhead of orchestrating
 multiple threads slows down the time to encode the raw data into the trie.
