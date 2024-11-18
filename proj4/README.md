@@ -20,6 +20,7 @@ by searching for the entire key, or by searching for a prefix.
 ## Data Structure
 
 ![Trie](./Trie.png)
+
 *In the image above, the prefix "dan" is found during search (red nodes) and each key with the same prefix is found by traversing
 through all of the prefix's children nodes*
 
