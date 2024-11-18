@@ -77,3 +77,9 @@ and that there could be a large speedup from SIMD for that workload; however, th
 One major downside of this approach is that the storage size for the raw column data isn't reduced. The encoded column file is a bit larger than
 the raw column file. This is because even though there are less repeated keys, the encoded file needs to store the indices at which each key can be found.
 This conversion increases the size of the file but greatly increases our ability to search through the data.
+
+## Conclusion
+The choice of the Trie data structure allowed us to search through the massive amount of column data in constant and nearly instantaneous time.
+The cost of this search speed was encoding time and space efficiency. The usage of a central data structure to store the encoded column data led to
+resource contention which hindered speedup from parallelization via multithreading. SIMD speedup during search was completely unnecessary since search
+times were already nearly instantaneous.
