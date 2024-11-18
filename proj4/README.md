@@ -3,12 +3,12 @@
 ## File Structure
 1. `trie.c` contains the trie data structure and functions to encode and search the data.
 2. `vanilla.c` contains the vanilla search functions.
-3. main.c is the deprecated program that uses a hash table to encode the column data,
+3. `main.c` is the deprecated program that uses a hash table to encode the column data,
 but it is unable to perform prefix search.
-4. encoding_speed_test.py measures and plots the time it took a hash table approach to encode the column data.
-5. enoding_speed_test_trie.py measures and plots the time it took the trie to encode the column data.
-6. helper.h contains helper functions for the deprecated hash table approach
-7. trie.h contains the function declarations for the trie data structure and functions.
+4. `encoding_speed_test.py` measures and plots the time it took a hash table approach to encode the column data.
+5. `encoding_speed_test_trie.py` measures and plots the time it took the trie to encode the column data.
+6. `helper.h` contains helper functions for the deprecated hash table approach
+7. `trie.h` contains the function declarations for the trie data structure and functions.
 
 ## How it Works
 
