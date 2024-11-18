@@ -1,14 +1,24 @@
 # Project 4: Encoding Column Data
 
+## File Structure
+1. `trie.c` contains the trie data structure and functions to encode and search the data.
+2. `vanilla.c` contains the vanilla search functions.
+3. main.c is the deprecated program that uses a hash table to encode the column data,
+but it is unable to perform prefix search.
+4. encoding_speed_test.py measures and plots the time it took a hash table approach to encode the column data.
+5. enoding_speed_test_trie.py measures and plots the time it took the trie to encode the column data.
+6. helper.h contains helper functions for the deprecated hash table approach
+7. trie.h contains the function declarations for the trie data structure and functions.
+
 ## How it Works
 
 1. The raw column data is ingested into a carefully selected data structure
 (explained below).
 2. The data is then written to a text file with the following form:
 
-  ```plaintext
-  daniel 3 8787 28823 1226268
-  ```
+```plaintext
+daniel 3 8787 28823 1226268
+```
 
   The first entry is the key, the second entry is the number of occurrances
   of this key in the original column data, and all following entries are
@@ -61,7 +71,9 @@ Time taken to search by prefix "dan": 2.71 seconds
 Time taken to search for word "dano": 2.68 seconds
 ```
 
-SIMD is not implemented as no speedup is necessary with this choice of data structure. I supposed that many keys could searched for simultaneously
-and that there could be a large speedup from SIMD for this workload; however, the assignment refers to search speedup during single key or single prefix searches.
+SIMD is not implemented as no speedup is necessary with this choice of data structure. I suppose that many keys could searched for simultaneously
+and that there could be a large speedup from SIMD for that workload; however, the assignment refers to search speedup during single key or single prefix searches.
 
-
+One major downside of this approach is that the storage size for the raw column data isn't reduced. The encoded column file is a bit larger than
+the raw column file. This is because even though there are less repeated keys, the encoded file needs to store the indices at which each key can be found.
+This conversion increases the size of the file but greatly increases our ability to search through the data.
