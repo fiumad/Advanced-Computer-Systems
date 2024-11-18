@@ -54,7 +54,7 @@ multiple threads slows down the time to encode the raw data into the trie.
 
 This deficiency is met with nearly instantaneous search times.
 
-With over 200,000,000 keys in the trie, the search time for a single word is measured as 0.000000 seconds.
+With almost 200,000,000 keys in the trie, the search time for a single word is measured as 0.000000 seconds.
 The time to search for all keys with a 3 letter prefix was 0.000074 seconds.
 
 
