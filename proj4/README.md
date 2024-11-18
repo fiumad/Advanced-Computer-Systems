@@ -24,7 +24,7 @@ by searching for the entire key, or by searching for a prefix.
 *In the image above, the prefix "dan" is found during search (red nodes) and each key with the same prefix is found by traversing
 through all of the prefix's children nodes*
 
-The data structure selected to store the encoded column data is a ![Trie](https://en.wikipedia.org/wiki/Trie).
+The data structure selected to store the encoded column data is a [Trie](https://en.wikipedia.org/wiki/Trie).
 Each node in the trie represents a single letter. As the column data is encoded, as an
 entire key is encoded, the tree grows as each letter is processed. This means that all
 keys in the data with the same prefix share the same nodes until the point at which they
@@ -47,11 +47,21 @@ This deficiency is met with nearly instantaneous search times.
 With over 200,000,000 keys in the trie, the search time for a single word is measured as 0.000000 seconds.
 The time to search for all keys with a 3 letter prefix was 0.000074 seconds.
 
+
+Time spent during trie search: (execution time for search_by_prefix and search_trie in trie.c)
 ```plaintext
 Time taken to search by prefix "dan": 0.000074 seconds
 Time taken to search for word "dano": 0.000000 seconds
 key dano has 315 occurrances
 ```
 
+Time spent during vanilla search was significantly longer: (Run time for vanilla.c)
+```plaintext
+Time taken to search by prefix "dan": 2.71 seconds
+Time taken to search for word "dano": 2.68 seconds
+```
+
 SIMD is not implemented as no speedup is necessary with this choice of data structure. I supposed that many keys could searched for simultaneously
 and that there could be a large speedup from SIMD for this workload; however, the assignment refers to search speedup during single key or single prefix searches.
+
+
