@@ -19,7 +19,7 @@ by searching for the entire key, or by searching for a prefix.
 
 ## Data Structure
 
-![Trie](./trie.png)
+![Trie](./Trie.png)
 *In the image above, the prefix "dan" is found during search (red nodes) and each key with the same prefix is found by traversing
 through all of the prefix's children nodes*
 
@@ -30,7 +30,7 @@ keys in the data with the same prefix share the same nodes until the point at wh
 diverge. This impressive storage efficiency as well as constant speed searches (both prefix and word).
 
 ## Results and Analysis
-The trie data structure is incredibly efficient at storing and searching for keys. It's drawback is
+The trie data structure is incredibly efficient at storing and searching for keys. Its drawback is
 that it is slow to encode the raw column data into the trie. This is because it cannot easily be parallelized without
 risk of resource contention. Unfortunately, multithreading the encoding process actually led to slower raw data ingest as
 the threads were constantly waiting on each other to access the trie. However, the trie is incredibly fast at searching for
