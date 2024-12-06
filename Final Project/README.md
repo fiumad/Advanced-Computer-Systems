@@ -111,3 +111,6 @@ Further changes would also be necessary to ensure the manufacturability of this 
 ## Conclusions
 
 The Time to Digital Converter is an important circuit with wide ranging applications. Successful measurement of elapsed time can be achieved with quite simple circuitry, but to achieve high measurement accuracy across a wide measurement range while remaining robust to typical variations, we must employ more advanced architectures and introduce further design complexities that can mitigate these issues.
+
+## Reference
+[1] S. Henzler, “Time-to-digital converters,” Springer Series in Advanced Microelectronics, 2010. doi:10.1007/978-90-481-8628-0
