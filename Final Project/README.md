@@ -55,6 +55,30 @@ Once we connect eight buffers end to end in the delay line, the delay of each bu
 
 We observe that the new delay per buffer is roughly 8ps. We can also see that our delay is consistent since our signal switches at ~8ps after one unit of delay, ~16ps after 2 units of delay, and \~64ps after 8 units of delay.
 
+### Top Level Schematic and Simulations
+
+![Top-Level Schematic](./imgs/top_level_schematic.png)
+
+~3ps measurement:
+
+![3ps measurement](./BASIC_TDC/3ps_Corrected.png)
+
+~9ps measurement:
+
+![9ps measurement](./BASIC_TDC/9ps_Corrected.png)
+
+~18ps measurement:
+
+![18ps measurement](./BASIC_TDC/18ps_Corrected.png)
+
+~30ps measurement:
+
+![30ps measurement](./BASIC_TDC/30ps_Corrected.png)
+
+~68ps measurement:
+
+![68ps measurement](./BASIC_TDC/68ps_Corrected.png)
+
 
 
 
