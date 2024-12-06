@@ -80,5 +80,34 @@ We observe that the new delay per buffer is roughly 8ps. We can also see that ou
 ![68ps measurement](./BASIC_TDC/68ps_Corrected.png)
 
 
+As we can see, our basic TDC implementation is able to successfully measure time differences at a resolution of 8ps with a time to measure of about 30ps in the worst case.
 
 
+### Design Improvements
+
+Our basic TDC implementation is successful, yet there are many improvements that could be made to address major limitations of the choice of such simple architecture.
+
+Firstly, our TDC is only able to measure up time differences of up to 64ps. If we wish to measure any longer than this, we would need to expand our delay line consuming area on our chip.
+
+Instead, we can implement a folded delay line with a loop counter.
+
+![Folded Delay Line](./imgs/folded_delay_line.png)
+
+With this architecture, our start signal triggers what is now a ring oscillator and a loop counter determines how many oscillations occur. This allows us to expand our measurement range to a much larger value (total delay of delay line * maximum counter value).
+
+Another improvement we could make is to increase the resolution beyond the minimum gate delay of our process. To do this, we can introduce a vernier delay line where we slow down both our start signal and our stop signal at the same time. Our new resolution is now limited by how closely we can tune the delay difference between two differently sized buffers.
+
+![Vernier Delay Line](./imgs/vernier_delay_line.png)
+
+We can also further improve the vernier delay line by making a more combinations of comparisons in a 2D grid of arbiters.
+
+![2D Vernier Line](./imgs/2d_vernier_line.png)
+
+Finally, we can also achieve fine control over the tradeoffs of our TDC by implemented a hierarchical structure in which we make course measurements, then pass residual time differences off to other finer measurement circuits.
+
+![Hierarchical Measurement Architecture](./imgs/hierarchical_measurement.png)
+Further changes would also be necessary to ensure the manufacturability of this circuit in order to overcome PVT variations. For example, if our delay unit delay changes because of an environmental temperature change, our measurement interpretation will be incorrect. To account for this we can add a control mechanism to our delay units so that we can calibrate to our conditions and adjust the delay of the delay line.
+
+## Conclusions
+
+The Time to Digital Converter is an important circuit with wide ranging applications. Successful measurement of elapsed time can be achieved with quite simple circuitry, but to achieve high measurement accuracy across a wide measurement range while remaining robust to typical variations, we must employ more advanced architectures and introduce further design complexities that can mitigate these issues.
