@@ -37,13 +37,13 @@ With these two tools (Pulse Arbiter and Delay Unit) we can successively slow dow
 
 The arbiter is implemented using a D-Flip-Flop. The Data line of the DFF is the delayed start signal. The clk port of the DFF is the stop signal. When the stop signal is toggled high, each arbiter will sample the state of the delayed start signal outputting a 1 if the start signal occurred first and a zero if the stop signal occurred first.
 
-![Arbiter Simulation](./BASIC_TDC/Arbiter Simulation.png)
+![Arbiter Simulation](./BASIC_TDC/Arbiter_Simulation.png)
 
 ### Delay Unit and Delay Line Simulation
 
 The delay unit is implemented using a high speed buffer. The speed of this buffer will determine the resolution of the entire TDC with the selected basic architecture.
 
-![Delay Unit Simulation](./BASIC_TDC/Single Buffer Delay.png)
+![Delay Unit Simulation](./BASIC_TDC/Single_Buffer_Delay.png)
 
 We observe that a single high speed buffer with no load connected to its output has a delay of roughly 6ps.
 
