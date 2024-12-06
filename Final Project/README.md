@@ -13,7 +13,7 @@ The ADPLL can enable other techniques such as Multiphase Clock Generation which 
 The ADPLL is a complex system that can be broken down into a few smaller sub circuits. The ADPLL is at its core, a feedback system. There are three major tasks 
 performed by the ADPLL:
 
-![ADPLL]('./imgs/ADPLL_diagram.png')
+![ADPLL Block Diagram](./imgs/ADPLL_diagram.png)
 
 1. Frequency Detection
 2. Control Signal Generation
